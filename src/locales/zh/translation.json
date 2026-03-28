@@ -1,0 +1,116 @@
+{
+    "nav": {
+        "platform": "平台",
+        "api": "API",
+        "about": "关于",
+        "get_started": "开始使用",
+        "dashboard": "仪表板",
+        "history": "历史"
+    },
+    "hero": {
+        "title_part1": "验证信息",
+        "title_part2": "在相信之前",
+        "subtitle": "快速、准确的多语言假新闻检测，由AI驱动。",
+        "cta_main": "验证声明",
+        "cta_secondary": "试用演示",
+        "badge": "AI驱动的真实性引擎",
+        "trusted": "受48+新闻编辑室信任"
+    },
+    "verify": {
+        "title": "输入您的声明",
+        "subtitle": "粘贴URL或输入声明以开始扫描。",
+        "placeholder": "在此粘贴声明或URL...",
+        "scan_btn": "运行深度扫描",
+        "listen": "收听摘要",
+        "pause": "暂停",
+        "listen_again": "再次收听",
+        "listening_in": "正在语音朗读",
+        "tts_not_supported": "您的浏览器不支持文字转语音功能",
+        "tabs": {
+            "text": "文本输入",
+            "url": "URL扫描"
+        },
+        "toggle_deep": "启用AI深度取证",
+        "toggle_source": "来源验证"
+    },
+    "report": {
+        "title": "分析报告",
+        "confidence": "置信度",
+        "status": {
+            "real": "已验证真实",
+            "fake": "已验证虚假",
+            "misleading": "误导性"
+        },
+        "details": "证据分解",
+        "metadata": "元数据分析",
+        "live_data": "实时数据",
+        "export": "导出",
+        "share": "分享"
+    },
+    "history": {
+        "title": "最近验证",
+        "new_btn": "新扫描",
+        "empty": "没有最近的报告。",
+        "search_placeholder": "搜索过去的扫描...",
+        "filter": "筛选",
+        "confidence": "置信度"
+    },
+    "features": {
+        "trust": {
+            "title": "无与伦比的信任",
+            "desc": "我们的算法在全球顶级新闻机构的数据集上训练。"
+        },
+        "accuracy": {
+            "title": "毫秒级精准",
+            "desc": "实时反馈，专为快速信息扩展设计。"
+        },
+        "multilingual": {
+            "title": "多语言支持",
+            "desc": "以母语级别语义理解检测120+种语言中的错误信息。"
+        }
+    },
+    "trending": {
+        "label": "实时趋势",
+        "title": "现在正在传播什么",
+        "subtitle": "各平台正在进行事实核查的热门声明",
+        "shares": "分享",
+        "view_analysis": "查看分析",
+        "view_all": "查看所有趋势",
+        "platforms": {
+            "whatsapp": "WhatsApp",
+            "twitter": "推特",
+            "instagram": "Instagram",
+            "youtube": "YouTube"
+        }
+    },
+    "analytics": {
+        "title": "分析仪表板",
+        "subtitle": "来自您验证历史的实时洞察",
+        "total": "总计",
+        "filters": {
+            "today": "今天",
+            "week": "本周",
+            "month": "本月",
+            "all": "所有时间"
+        },
+        "stats": {
+            "total": "总扫描",
+            "real": "已验证真实",
+            "fake": "已验证虚假",
+            "misleading": "误导性"
+        },
+        "charts": {
+            "verdict_dist": "判决分布",
+            "activity": "扫描活动",
+            "confidence": "置信度分布",
+            "language": "语言细分",
+            "verdict_subtitle": "所有已处理分析的结果分布",
+            "activity_subtitle": "当前期间的每日扫描请求量",
+            "confidence_subtitle": "已处理链接和文本的置信度级别",
+            "language_subtitle": "按数量使用的热门语言"
+        }
+    },
+    "footer": {
+        "copy": "TruthLens AI。通过数字真实性追求真相。"
+    }
+}

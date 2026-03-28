@@ -12,13 +12,19 @@ import translationHI from './locales/hi/translation.json';
 import translationTE from './locales/te/translation.json';
 import translationTA from './locales/ta/translation.json';
 import translationBN from './locales/bn/translation.json';
+import translationZH from './locales/zh/translation.json';
+import translationJA from './locales/ja/translation.json';
+import translationKO from './locales/ko/translation.json';
 
 const resources = {
   en: { translation: translationEN },
   hi: { translation: translationHI },
   te: { translation: translationTE },
   ta: { translation: translationTA },
-  bn: { translation: translationBN }
+  bn: { translation: translationBN },
+  zh: { translation: translationZH },
+  ja: { translation: translationJA },
+  ko: { translation: translationKO }
 };
 
 i18n

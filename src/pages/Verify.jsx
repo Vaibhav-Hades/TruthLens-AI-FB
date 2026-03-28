@@ -1,17 +1,88 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Search, Link as LinkIcon, FileText, Activity, Globe } from 'lucide-react'
+import { Search, Link as LinkIcon, FileText, Activity, Globe, Volume2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
+const langCodeMap = {
+   en: 'en-IN',
+   hi: 'hi-IN',
+   te: 'te-IN',
+   ta: 'ta-IN',
+   bn: 'bn-IN',
+   zh: 'zh-CN',
+   ja: 'ja-JP',
+   ko: 'ko-KR',
+   ar: 'ar-SA',
+   fr: 'fr-FR',
+   es: 'es-ES',
+}
+
 const Verify = () => {
-   const { t } = useTranslation()
+   const { t, i18n } = useTranslation()
    const navigate = useNavigate()
-   const [activeTab, setActiveTab] = useState('text')
    const [inputText, setInputText] = useState('')
    const [isScanning, setIsScanning] = useState(false)
    const [scanStatus, setScanStatus] = useState('')
    const [deepScan, setDeepScan] = useState(true)
    const [sourceVerify, setSourceVerify] = useState(true)
+
+   const [ttsState, setTtsState] = useState('idle')
+
+   useEffect(() => {
+      return () => window.speechSynthesis && window.speechSynthesis.cancel();
+   }, []);
+
+   const generatedSummary = inputText.trim() ? inputText.trim() : "";
+   const wordCount = generatedSummary.split(/\s+/).filter(w => w.length > 0).length;
+   const charCount = generatedSummary.length;
+
+   const handleSpeak = () => {
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(generatedSummary);
+      utterance.lang = langCodeMap[i18n.language] || 'en-IN';
+      utterance.rate = 0.9;
+      utterance.pitch = 1;
+
+      utterance.onstart = () => setTtsState('playing');
+      utterance.onend = () => setTtsState('finished');
+      utterance.onerror = () => setTtsState('idle');
+
+      window.speechSynthesis.speak(utterance);
+   }
+
+   const handleStop = () => {
+      window.speechSynthesis.cancel();
+      setTtsState('idle');
+   }
+
+   const previewData = React.useMemo(() => {
+      if (!inputText.trim()) return null;
+
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      const urls = inputText.match(urlRegex);
+      if (!urls) return null;
+
+      const urlToProcess = urls[0];
+
+      try {
+         new URL(urlToProcess);
+      } catch {
+         return null;
+      }
+
+      const ytMatch = urlToProcess.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+      if (ytMatch && ytMatch[1]) {
+         return { type: 'youtube', id: ytMatch[1] };
+      }
+
+      const igMatch = urlToProcess.match(/(?:instagram\.com\/(?:p|reel|reels)\/)([A-Za-z0-9_-]+)/i);
+      if (igMatch && igMatch[1]) {
+         return { type: 'instagram', id: igMatch[1] };
+      }
+
+      return { type: 'unsupported' };
+   }, [inputText]);
 
    const handleScan = (e) => {
       e.preventDefault()
@@ -35,40 +106,128 @@ const Verify = () => {
             </div>
 
             <div className="bg-white/90 backdrop-blur-xl rounded-[2.5rem] border border-[--color-border] shadow-[0_32px_80px_rgba(0,0,0,0.06)] p-8 relative overflow-hidden">
-               <div className="relative flex bg-slate-100/80 p-1.5 rounded-2xl mb-10 overflow-hidden">
-                  <div className="absolute top-1.5 bottom-1.5 left-1.5 w-[calc(50%-6px)] bg-gradient-to-r from-[#0066FF] to-[#0050CB] rounded-xl transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] shadow-md" style={{ transform: activeTab === 'text' ? 'translateX(0)' : 'translateX(100%)' }}></div>
-
-                  <button
-                     onClick={() => setActiveTab('text')}
-                     className={`flex-1 relative z-10 flex items-center justify-center gap-2 py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-colors duration-300 ${activeTab === 'text' ? 'text-white' : 'text-slate-500 hover:text-[--color-on-surface]'}`}
-                  >
-                     <FileText className="w-4 h-4" />
-                     {t('verify.tabs.text')}
-                  </button>
-                  <button
-                     onClick={() => setActiveTab('url')}
-                     className={`flex-1 relative z-10 flex items-center justify-center gap-2 py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-colors duration-300 ${activeTab === 'url' ? 'text-white' : 'text-slate-500 hover:text-[--color-on-surface]'}`}
-                  >
-                     <LinkIcon className="w-4 h-4" />
-                     {t('verify.tabs.url')}
-                  </button>
-               </div>
-
                <div className="space-y-8">
-                  <div className="relative group">
-                     <div className="absolute -inset-0.5 bg-gradient-to-r from-primary via-accent-cyan to-primary rounded-[2rem] blur opacity-0 group-focus-within:opacity-100 transition duration-500 animate-[gradient-shift_3s_ease_infinite] bg-[length:200%_200%]"></div>
-                     <textarea
-                        value={inputText}
-                        onChange={(e) => setInputText(e.target.value)}
-                        placeholder={t('verify.placeholder')}
-                        className="relative w-full h-48 bg-white/60 backdrop-blur-md border border-[--color-border] focus:border-transparent rounded-3xl p-8 outline-none text-lg font-medium transition-all resize-none shadow-inner z-10 text-[--color-on-surface]"
-                     />
+                  <div className="flex flex-col gap-6">
+                     <div className="flex items-center gap-3 ml-2">
+                        <div className="p-2.5 bg-primary/10 rounded-xl border border-primary/20 text-primary shadow-sm">
+                           <LinkIcon className="w-5 h-5" />
+                        </div>
+                        <h3 className="text-2xl font-display font-black tracking-tight text-[--color-on-surface]">
+                           Paste a claim or video link
+                        </h3>
+                     </div>
 
-                     <div className={`absolute left-0 -bottom-8 flex items-center gap-2 px-2 transition-all duration-500 ${inputText.length > 5 ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
-                        <Globe className="w-4 h-4 text-primary animate-pulse" />
-                        <span className="text-[10px] font-bold text-[--color-muted] uppercase tracking-widest">Detected: <span className="text-primary ml-1">English</span></span>
+                     <div className="relative group">
+                        <div className="absolute -inset-0.5 bg-gradient-to-r from-primary via-accent-cyan to-primary rounded-[2rem] blur opacity-0 group-focus-within:opacity-100 transition duration-500 animate-[gradient-shift_3s_ease_infinite] bg-[length:200%_200%]"></div>
+                        <textarea
+                           value={inputText}
+                           onChange={(e) => setInputText(e.target.value)}
+                           placeholder="Drop a YouTube/Instagram link, or type a claim..."
+                           className="relative w-full h-36 bg-white/80 backdrop-blur-md border border-[--color-border] focus:border-transparent rounded-3xl p-6 outline-none text-lg font-medium transition-all resize-none shadow-inner z-10 text-[--color-on-surface]"
+                        />
                      </div>
                   </div>
+
+                  {previewData && (
+                     <div className="animate-in fade-in slide-in-from-top-4 duration-500 fill-mode-both">
+                        {previewData.type === 'youtube' && (
+                           <div className="bg-slate-50 p-4 rounded-[2rem] border border-[--color-border] shadow-sm mt-4">
+                              <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-inner bg-slate-900 border border-[--color-border]">
+                                 <iframe
+                                    width="100%"
+                                    height="100%"
+                                    src={`https://www.youtube.com/embed/${previewData.id}`}
+                                    title="YouTube preview"
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                 ></iframe>
+                              </div>
+                           </div>
+                        )}
+                        {previewData.type === 'instagram' && (
+                           <div className="bg-slate-50 p-4 rounded-[2rem] border border-[--color-border] shadow-sm mt-4 flex justify-center">
+                              <div className="w-full max-w-sm bg-white rounded-2xl overflow-hidden shadow-inner border border-[--color-border]">
+                                 <iframe
+                                    src={`https://www.instagram.com/p/${previewData.id}/embed`}
+                                    className="w-full"
+                                    height="480"
+                                    frameBorder="0"
+                                    scrolling="no"
+                                    allowTransparency="true"
+                                 ></iframe>
+                              </div>
+                           </div>
+                        )}
+                        {previewData.type === 'unsupported' && (
+                           <div className="bg-rose-50/80 text-rose-600 p-6 rounded-[1.5rem] border border-rose-100 flex flex-col items-center justify-center gap-2 mt-4 shadow-sm text-center">
+                              <Activity className="w-6 h-6 animate-pulse" />
+                              <div>
+                                 <div className="font-bold uppercase tracking-widest text-xs">Unsupported Link</div>
+                                 <div className="text-[10px] text-rose-500 font-medium mt-1">Video preview is unavailable for this platform.</div>
+                              </div>
+                           </div>
+                        )}
+
+                        {previewData.type !== 'unsupported' && (
+                           <div className="bg-primary/5 p-6 rounded-[1.5rem] border border-primary/20 mt-4 flex items-start gap-4">
+                              <div className="p-2 bg-white rounded-lg shadow-sm text-primary shrink-0">
+                                 <FileText className="w-5 h-5" />
+                              </div>
+                              <div>
+                                 <h4 className="font-bold text-sm tracking-widest uppercase text-primary mb-1">Claim Summary</h4>
+                                 <p className="text-xs font-medium text-[--color-muted] leading-relaxed">
+                                    Our AI will automatically transcribe this media, extract the core claims, and cross-reference them in real-time upon verification.
+                                 </p>
+                              </div>
+                           </div>
+                        )}
+                     </div>
+                  )}
+
+                  {inputText.trim().length > 0 && (
+                     <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 mt-6 animate-in fade-in slide-in-from-top-4 duration-500 relative">
+                        {(!('speechSynthesis' in window)) && (
+                           <div className="mb-3 text-xs font-bold text-amber-600 bg-amber-100/50 px-3 py-1.5 rounded-lg flex items-center gap-2">
+                              ⚠️ {t('verify.tts_not_supported', "Text-to-speech not supported")} (Try Chrome)
+                           </div>
+                        )}
+                        <h4 className="flex items-center gap-2 font-black text-sm text-[--color-on-surface] uppercase tracking-widest mb-3">
+                           <FileText className="w-4 h-4 text-primary" /> Auto Summary
+                        </h4>
+                        <p className="text-[--color-on-surface] text-lg leading-relaxed font-medium mb-4 break-words">
+                           {generatedSummary}
+                        </p>
+
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-blue-100">
+                           <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                              <span>{wordCount} Words</span>
+                              <span>{charCount} Characters</span>
+                              {ttsState === 'playing' && (
+                                 <span className="text-primary flex items-center gap-1">
+                                    <Volume2 className="w-3 h-3 animate-pulse" /> {t('verify.listening_in', "Speaking in")} {i18n.language.toUpperCase()}
+                                 </span>
+                              )}
+                           </div>
+
+                           {ttsState !== 'playing' ? (
+                              <button onClick={handleSpeak} className="flex items-center justify-center gap-3 px-6 py-3 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary-dark transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-95">
+                                 <Volume2 className="w-5 h-5" />
+                                 {ttsState === 'finished' ? t('verify.listen_again', "Listen Again") : t('verify.listen', "Listen to Summary")}
+                              </button>
+                           ) : (
+                              <button onClick={handleStop} className="flex items-center justify-center gap-3 px-6 py-3 bg-rose-500 text-white rounded-xl font-bold text-sm shadow-md active:scale-95">
+                                 <div className="flex items-end gap-0.5 h-5">
+                                    {[3, 5, 4, 6, 3].map((h, i) => (
+                                       <div key={i} className="w-1 bg-white rounded-full animate-[bounce_0.8s_ease-in-out_infinite]" style={{ height: `${h * 3}px`, animationDelay: `${i * 100}ms` }} />
+                                    ))}
+                                 </div>
+                                 {t('verify.pause', "Pause")}
+                              </button>
+                           )}
+                        </div>
+                     </div>
+                  )}
 
                   <div className="pt-6 grid md:grid-cols-2 gap-5">
                      <div
@@ -112,7 +271,7 @@ const Verify = () => {
                         ) : (
                            <span className="flex items-center gap-3 relative z-10">
                               <Search className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                              {t('verify.scan_btn')}
+                              Verify Content
                            </span>
                         )}
 

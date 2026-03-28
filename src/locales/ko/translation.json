@@ -1,0 +1,116 @@
+{
+    "nav": {
+        "platform": "플랫폼",
+        "api": "API",
+        "about": "소개",
+        "get_started": "시작하기",
+        "dashboard": "대시보드",
+        "history": "기록"
+    },
+    "hero": {
+        "title_part1": "정보를 확인하세요",
+        "title_part2": "믿기 전에",
+        "subtitle": "AI 기반의 빠르고 정확한 다국어 가짜 뉴스 탐지.",
+        "cta_main": "주장 확인",
+        "cta_secondary": "데모 체험",
+        "badge": "AI 기반 진실성 엔진",
+        "trusted": "48개 이상의 뉴스룸이 신뢰"
+    },
+    "verify": {
+        "title": "주장 입력",
+        "subtitle": "URL을 붙여넣거나 문장을 입력하여 스캔을 시작하세요.",
+        "placeholder": "여기에 주장 또는 URL 붙여넣기...",
+        "scan_btn": "심층 스캔 실행",
+        "listen": "요약 듣기",
+        "pause": "일시정지",
+        "listen_again": "다시 듣기",
+        "listening_in": "말하는 중",
+        "tts_not_supported": "브라우저에서 텍스트 음성 변환을 지원하지 않습니다",
+        "tabs": {
+            "text": "텍스트 입력",
+            "url": "URL 스캔"
+        },
+        "toggle_deep": "AI 심층 포렌식 활성화",
+        "toggle_source": "출처 검증"
+    },
+    "report": {
+        "title": "분석 보고서",
+        "confidence": "신뢰도",
+        "status": {
+            "real": "실제 확인됨",
+            "fake": "가짜 확인됨",
+            "misleading": "오해의 소지"
+        },
+        "details": "증거 분석",
+        "metadata": "메타데이터 분석",
+        "live_data": "실시간 데이터",
+        "export": "내보내기",
+        "share": "공유"
+    },
+    "history": {
+        "title": "최근 검증",
+        "new_btn": "새 스캔",
+        "empty": "최근 보고서가 없습니다.",
+        "search_placeholder": "과거 스캔 검색...",
+        "filter": "필터",
+        "confidence": "신뢰도"
+    },
+    "features": {
+        "trust": {
+            "title": "탁월한 신뢰",
+            "desc": "전 세계 최고 언론 기관의 데이터셋으로 훈련된 알고리즘."
+        },
+        "accuracy": {
+            "title": "밀리초 정확도",
+            "desc": "고성능 엔진으로 실시간 피드백 제공."
+        },
+        "multilingual": {
+            "title": "다국어 지원",
+            "desc": "120개 이상의 언어에서 원어민 수준의 의미 이해로 허위 정보 탐지."
+        }
+    },
+    "trending": {
+        "label": "실시간 트렌드",
+        "title": "지금 퍼지고 있는 것",
+        "subtitle": "각 플랫폼에서 팩트체크 중인 주요 주장",
+        "shares": "공유",
+        "view_analysis": "분석 보기",
+        "view_all": "모든 트렌드 보기",
+        "platforms": {
+            "whatsapp": "WhatsApp",
+            "twitter": "트위터",
+            "instagram": "Instagram",
+            "youtube": "YouTube"
+        }
+    },
+    "analytics": {
+        "title": "분석 대시보드",
+        "subtitle": "검증 기록의 실시간 인사이트",
+        "total": "합계",
+        "filters": {
+            "today": "오늘",
+            "week": "이번 주",
+            "month": "이번 달",
+            "all": "전체 기간"
+        },
+        "stats": {
+            "total": "총 스캔",
+            "real": "실제 확인",
+            "fake": "가짜 확인",
+            "misleading": "오해의 소지"
+        },
+        "charts": {
+            "verdict_dist": "판정 분포",
+            "activity": "스캔 활동",
+            "confidence": "신뢰도 분포",
+            "language": "언어 분석",
+            "verdict_subtitle": "처리된 모든 분석의 결과 분포",
+            "activity_subtitle": "현재 기간의 일별 스캔 요청량",
+            "confidence_subtitle": "처리된 링크 및 텍스트의 신뢰도 수준",
+            "language_subtitle": "볼륨별 상위 언어"
+        }
+    },
+    "footer": {
+        "copy": "TruthLens AI. 디지털 진실성을 통한 진실 추구."
+    }
+}

@@ -9,7 +9,10 @@ const languages = [
   { code: 'hi', native: 'हिन्दी', flag: '🇮🇳' },
   { code: 'te', native: 'తెలుగు', flag: '🇮🇳' },
   { code: 'ta', native: 'தமிழ்', flag: '🇮🇳' },
-  { code: 'bn', native: 'বাংলা', flag: '🇮🇳' }
+  { code: 'bn', native: 'বাংলা', flag: '🇮🇳' },
+  { code: 'zh', native: '中文', flag: '🇨🇳' },
+  { code: 'ja', native: '日本語', flag: '🇯🇵' },
+  { code: 'ko', native: '한국어', flag: '🇰🇷' }
 ]
 
 const Navbar = () => {

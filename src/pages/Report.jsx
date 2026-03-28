@@ -105,13 +105,13 @@ const Report = () => {
                   </div>
 
                   {/* Evidence Breakdown */}
-                  <div className="bg-[#0f172a] p-10 rounded-[2.5rem] shadow-[0_32px_80px_rgba(0,0,0,0.3)] text-white space-y-10 animate-in fade-in slide-in-from-bottom duration-1000 delay-500 fill-mode-both border border-white/5 relative overflow-hidden hover:shadow-[0_40px_100px_rgba(0,0,0,0.4)] transition-shadow">
-                     <div className="absolute top-0 right-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+                  <div className="bg-white p-10 rounded-[2.5rem] shadow-sm border border-[--color-border] space-y-8 animate-in fade-in slide-in-from-bottom duration-1000 delay-500 fill-mode-both relative overflow-hidden transition-shadow">
+                     <div className="absolute top-0 right-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[--color-border] to-transparent"></div>
 
                      <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-3xl font-display font-black tracking-tight">{t('report.details')}</h2>
-                        <div className="px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest text-accent-cyan flex items-center gap-2 border border-white/10">
-                           <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse"></span>
+                        <h2 className="text-3xl font-display font-black tracking-tight text-[--color-on-surface]">{t('report.details')}</h2>
+                        <div className="px-4 py-1.5 bg-primary/10 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 border border-primary/20">
+                           <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
                            Live Data
                         </div>
                      </div>
@@ -121,12 +121,12 @@ const Report = () => {
                            { title: 'Global News Hubs', match: '98% Exact Match', desc: 'Associated Press, Reuters, BBC News confirmed source context.', color: 'border-[--color-success]' },
                            { title: 'Temporal Consistency', match: 'Timestamp Validated', desc: 'Creation date strictly aligns with observed historical events.', color: 'border-[--color-success]' }
                         ].map((item, idx) => (
-                           <div key={idx} className={`bg-white/5 p-8 rounded-2xl border-y border-r border-white/5 border-l-4 ${item.color} hover:bg-white/10 hover:shadow-[0_0_40px_rgba(255,255,255,0.03)] hover:-translate-y-0.5 transition-all duration-300`}>
+                           <div key={idx} className={`bg-slate-50 p-8 rounded-2xl border-y border-r border-[--color-border] border-l-4 ${item.color} hover:bg-slate-100 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-300`}>
                               <div className="flex justify-between items-start mb-4">
-                                 <h4 className="text-xl font-display font-bold tracking-tight text-slate-100">{item.title}</h4>
-                                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[--color-success] bg-[--color-success-light]/20 px-3 py-1 rounded-full">{item.match}</span>
+                                 <h4 className="text-xl font-display font-bold tracking-tight text-[--color-on-surface]">{item.title}</h4>
+                                 <span className="text-sm font-black uppercase tracking-[0.2em] text-[--color-success] bg-[--color-success-light]/20 px-3 py-1 rounded-full">{item.match}</span>
                               </div>
-                              <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
+                              <p className="text-[--color-muted] text-sm leading-relaxed">{item.desc}</p>
                            </div>
                         ))}
                      </div>

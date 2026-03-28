@@ -1,0 +1,116 @@
+{
+    "nav": {
+        "platform": "プラットフォーム",
+        "api": "API",
+        "about": "概要",
+        "get_started": "始める",
+        "dashboard": "ダッシュボード",
+        "history": "履歴"
+    },
+    "hero": {
+        "title_part1": "情報を確認する",
+        "title_part2": "信じる前に",
+        "subtitle": "AIによる高速・正確・多言語のフェイクニュース検出。",
+        "cta_main": "主張を確認",
+        "cta_secondary": "デモを試す",
+        "badge": "AI搭載の真実性エンジン",
+        "trusted": "48以上のニュースルームが信頼"
+    },
+    "verify": {
+        "title": "主張を入力",
+        "subtitle": "URLを貼り付けるか、文を入力してスキャンを開始します。",
+        "placeholder": "ここに主張またはURLを貼り付け...",
+        "scan_btn": "ディープスキャン実行",
+        "listen": "要約を聴く",
+        "pause": "一時停止",
+        "listen_again": "もう一度聴く",
+        "listening_in": "読み上げ中",
+        "tts_not_supported": "お使いのブラウザはテキスト読み上げをサポートしていません",
+        "tabs": {
+            "text": "テキスト入力",
+            "url": "URLスキャン"
+        },
+        "toggle_deep": "AIディープフォレンジックを有効化",
+        "toggle_source": "ソース検証"
+    },
+    "report": {
+        "title": "分析レポート",
+        "confidence": "信頼度",
+        "status": {
+            "real": "本物と確認",
+            "fake": "偽物と確認",
+            "misleading": "誤解を招く"
+        },
+        "details": "証拠の内訳",
+        "metadata": "メタデータ分析",
+        "live_data": "ライブデータ",
+        "export": "エクスポート",
+        "share": "共有"
+    },
+    "history": {
+        "title": "最近の検証",
+        "new_btn": "新しいスキャン",
+        "empty": "最近のレポートはありません。",
+        "search_placeholder": "過去のスキャンを検索...",
+        "filter": "フィルター",
+        "confidence": "信頼度"
+    },
+    "features": {
+        "trust": {
+            "title": "比類なき信頼",
+            "desc": "世界のトップジャーナリズム機関のデータセットで訓練されたアルゴリズム。"
+        },
+        "accuracy": {
+            "title": "ミリ秒精度",
+            "desc": "高並行エンジンによるリアルタイムフィードバック。"
+        },
+        "multilingual": {
+            "title": "多言語サポート",
+            "desc": "120以上の言語でネイティブレベルの意味理解で誤情報を検出。"
+        }
+    },
+    "trending": {
+        "label": "ライブトレンド",
+        "title": "今拡散していること",
+        "subtitle": "各プラットフォームでファクトチェックされているトップクレーム",
+        "shares": "シェア",
+        "view_analysis": "分析を見る",
+        "view_all": "すべてのトレンドを見る",
+        "platforms": {
+            "whatsapp": "WhatsApp",
+            "twitter": "ツイッター",
+            "instagram": "Instagram",
+            "youtube": "YouTube"
+        }
+    },
+    "analytics": {
+        "title": "分析ダッシュボード",
+        "subtitle": "検証履歴からのリアルタイムインサイト",
+        "total": "合計",
+        "filters": {
+            "today": "今日",
+            "week": "今週",
+            "month": "今月",
+            "all": "全期間"
+        },
+        "stats": {
+            "total": "総スキャン",
+            "real": "本物確認",
+            "fake": "偽物確認",
+            "misleading": "誤解을招く"
+        },
+        "charts": {
+            "verdict_dist": "判定分布",
+            "activity": "スキャン活動",
+            "confidence": "信頼度分布",
+            "language": "言語内訳",
+            "verdict_subtitle": "処理済み分析の結果分布",
+            "activity_subtitle": "現在期間の日次スキャンリクエスト量",
+            "confidence_subtitle": "処理済みリンクとテキストの信頼度レベル",
+            "language_subtitle": "ボリューム別上位言語"
+        }
+    },
+    "footer": {
+        "copy": "TruthLens AI。デジタル真実性を通じた真実の追求。"
+    }
+}
