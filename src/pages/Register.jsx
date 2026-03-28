@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, Mail, User } from 'lucide-react';
+import { Eye, EyeOff, Mail, User, Mic } from 'lucide-react';
 
 const Register = () => {
     const { t } = useTranslation();
@@ -17,6 +17,39 @@ const Register = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [pwdStrength, setPwdStrength] = useState(0);
+    const [activeVoiceField, setActiveVoiceField] = useState(null);
+
+    const handleVoiceType = (field) => {
+        window.speechSynthesis?.cancel();
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert("Voice recognition not supported. Please use Chrome.");
+            return;
+        }
+        setActiveVoiceField(field);
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.onresult = (e) => {
+            let text = e.results[0][0].transcript;
+            
+            // Format specific rules
+            if(field === 'email') {
+                text = text.toLowerCase().replace(/\bat\b/g, '@').replace(/\bdot\b/g, '.').replace(/\s+/g, '');
+                setEmail(text);
+            } else if (field === 'name') {
+                setName(text);
+            } else if (field === 'password') {
+                text = text.toLowerCase().replace(/\bat\b/g, '@').replace(/\bdot\b/g, '.').replace(/\s+/g, '');
+                setPassword(text);
+            } else if (field === 'confirmPassword') {
+                text = text.toLowerCase().replace(/\bat\b/g, '@').replace(/\bdot\b/g, '.').replace(/\s+/g, '');
+                setConfirmPassword(text);
+            }
+        };
+        recognition.onerror = () => setActiveVoiceField(null);
+        recognition.onend = () => setActiveVoiceField(null);
+        recognition.start();
+    };
 
     useEffect(() => {
         let score = 0;
@@ -66,7 +99,10 @@ const Register = () => {
                         <label className="block text-xs font-bold uppercase tracking-widest text-[--color-muted] mb-2">{t('auth.full_name')}</label>
                         <div className="relative">
                             <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                            <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full pl-11 pr-4 py-3 bg-white border border-[--color-border] rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium text-[--color-on-surface]" />
+                            <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full pl-11 pr-12 py-3 bg-white border border-[--color-border] rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium text-[--color-on-surface]" />
+                            <button type="button" onClick={() => handleVoiceType('name')} className={`absolute right-4 top-1/2 -translate-y-1/2 hover:text-primary transition-colors ${activeVoiceField === 'name' ? 'text-rose-500 animate-pulse' : 'text-slate-400'}`}>
+                                <Mic className="w-4 h-4" />
+                            </button>
                         </div>
                     </div>
 
@@ -74,17 +110,25 @@ const Register = () => {
                         <label className="block text-xs font-bold uppercase tracking-widest text-[--color-muted] mb-2">{t('auth.email')}</label>
                         <div className="relative">
                             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                            <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full pl-11 pr-4 py-3 bg-white border border-[--color-border] rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium text-[--color-on-surface]" />
+                            <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full pl-11 pr-12 py-3 bg-white border border-[--color-border] rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium text-[--color-on-surface]" />
+                            <button type="button" onClick={() => handleVoiceType('email')} className={`absolute right-4 top-1/2 -translate-y-1/2 hover:text-primary transition-colors ${activeVoiceField === 'email' ? 'text-rose-500 animate-pulse' : 'text-slate-400'}`}>
+                                <Mic className="w-4 h-4" />
+                            </button>
                         </div>
                     </div>
 
                     <div>
                         <label className="block text-xs font-bold uppercase tracking-widest text-[--color-muted] mb-2">{t('auth.password')}</label>
                         <div className="relative mb-2">
-                            <input type={showPwd ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)} className="w-full px-4 py-3 bg-white border border-[--color-border] rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium text-[--color-on-surface]" />
-                            <button type="button" onClick={() => setShowPwd(!showPwd)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary">
-                                {showPwd ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                            </button>
+                            <input type={showPwd ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)} className="w-full pl-4 pr-20 py-3 bg-white border border-[--color-border] rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium text-[--color-on-surface]" />
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-3 text-slate-400">
+                                <button type="button" onClick={() => handleVoiceType('password')} className={`hover:text-primary transition-colors ${activeVoiceField === 'password' ? 'text-rose-500 animate-pulse' : ''}`}>
+                                    <Mic className="w-4 h-4" />
+                                </button>
+                                <button type="button" onClick={() => setShowPwd(!showPwd)} className="hover:text-primary transition-colors">
+                                    {showPwd ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                </button>
+                            </div>
                         </div>
                         {password && (
                             <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden transition-all">
@@ -95,7 +139,12 @@ const Register = () => {
 
                     <div>
                         <label className="block text-xs font-bold uppercase tracking-widest text-[--color-muted] mb-2">{t('auth.confirm_password')}</label>
-                        <input type={showPwd ? "text" : "password"} required value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="w-full px-4 py-3 bg-white border border-[--color-border] rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium text-[--color-on-surface]" />
+                        <div className="relative text-slate-400">
+                            <input type={showPwd ? "text" : "password"} required value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="w-full pl-4 pr-12 py-3 bg-white border border-[--color-border] rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium text-[--color-on-surface]" />
+                            <button type="button" onClick={() => handleVoiceType('confirmPassword')} className={`absolute right-4 top-1/2 -translate-y-1/2 hover:text-primary transition-colors ${activeVoiceField === 'confirmPassword' ? 'text-rose-500 animate-pulse' : ''}`}>
+                                <Mic className="w-4 h-4" />
+                            </button>
+                        </div>
                     </div>
 
                     <button type="submit" disabled={isLoading} className="w-full bg-primary hover:bg-primary-dark text-white rounded-xl py-4 font-black uppercase tracking-widest text-xs transition-all flex justify-center items-center gap-2 mt-4 shadow-md active:scale-95 disabled:opacity-70">

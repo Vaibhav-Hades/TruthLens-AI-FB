@@ -81,20 +81,54 @@ const Verify = () => {
          return { type: 'instagram', id: igMatch[1] };
       }
 
-      return { type: 'unsupported' };
+      const domain = new URL(urlToProcess).hostname;
+      return { type: 'news_article', domain, url: urlToProcess };
    }, [inputText]);
 
-   const handleScan = (e) => {
-      e.preventDefault()
-      setIsScanning(true)
-      setScanStatus('Cross-referencing sources...')
+   const handleScan = async (e) => {
+      e.preventDefault();
+      setIsScanning(true);
+      setScanStatus('Cross-referencing sources...');
 
-      setTimeout(() => {
-         setScanStatus('Analyzing metadata...')
+      try {
+         const API_KEY = "AIzaSyCOwDI1VvL4CmRUVR6NcpZN9nG_Fb_r9BY";
+         const prompt = `You are a professional fact-checker algorithm called TruthLens. Analyze this text or URL context strictly: "${inputText}". 
+Provide a realistic accuracy report strictly in this JSON format ONLY (no markdown or extra text):
+{
+  "score": <number 0-100 representing credibility>,
+  "conclusion": "Confirmed" | "Likely True" | "Needs Context" | "Fake",
+  "summary": "<3-4 sentence detailed factual summary. IF a URL or Post is provided, YOU MUST explicitly state the EXACT Date, Time, and Author/Creator of the post in your summary. Be highly accurate.>",
+  "evidence": [
+     { "title": "<e.g., Global News Hubs>", "match": "<e.g., 90% Match>", "desc": "<one sentence about the evidence>" }
+  ]
+}`;
+         
+         const payload = {
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.1, responseMimeType: 'application/json' },
+            tools: [{ googleSearch: {} }]
+         };
+
+         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+         });
+
+         const data = await res.json();
+         let resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+         resultText = resultText.replace(/```json/gi, '').replace(/```/g, '').trim();
+         const analysisData = JSON.parse(resultText);
+
+         setScanStatus('Analyzing metadata...');
          setTimeout(() => {
-            navigate('/report')
-         }, 1500)
-      }, 1500)
+            navigate('/report', { state: { url: inputText, type: previewData?.type, domain: previewData?.domain, aiData: analysisData } });
+         }, 800);
+      } catch (err) {
+         console.error(err);
+         // Fallback navigate
+         navigate('/report', { state: { url: inputText, type: previewData?.type, domain: previewData?.domain } });
+      }
    }
 
    return (
@@ -113,7 +147,7 @@ const Verify = () => {
                            <LinkIcon className="w-5 h-5" />
                         </div>
                         <h3 className="text-2xl font-display font-black tracking-tight text-[--color-on-surface]">
-                           Paste a claim or video link
+                           Paste a claim, video, or news link
                         </h3>
                      </div>
 
@@ -122,7 +156,7 @@ const Verify = () => {
                         <textarea
                            value={inputText}
                            onChange={(e) => setInputText(e.target.value)}
-                           placeholder="Drop a YouTube/Instagram link, or type a claim..."
+                           placeholder="Drop a YouTube, Instagram, or News Website link, or type a claim..."
                            className="relative w-full h-36 bg-white/80 backdrop-blur-md border border-[--color-border] focus:border-transparent rounded-3xl p-6 outline-none text-lg font-medium transition-all resize-none shadow-inner z-10 text-[--color-on-surface]"
                         />
                      </div>
@@ -159,25 +193,27 @@ const Verify = () => {
                               </div>
                            </div>
                         )}
-                        {previewData.type === 'unsupported' && (
-                           <div className="bg-rose-50/80 text-rose-600 p-6 rounded-[1.5rem] border border-rose-100 flex flex-col items-center justify-center gap-2 mt-4 shadow-sm text-center">
-                              <Activity className="w-6 h-6 animate-pulse" />
-                              <div>
-                                 <div className="font-bold uppercase tracking-widest text-xs">Unsupported Link</div>
-                                 <div className="text-[10px] text-rose-500 font-medium mt-1">Video preview is unavailable for this platform.</div>
+                        {previewData.type === 'news_article' && (
+                           <div className="bg-blue-50/50 p-6 rounded-[2rem] border border-blue-100 shadow-inner mt-4 flex flex-col items-center justify-center gap-2 text-center relative overflow-hidden">
+                              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full pointer-events-none"></div>
+                              <Globe className="w-10 h-10 text-primary/80 mb-2 drop-shadow-sm" />
+                              <h4 className="font-display font-black text-xl text-[--color-on-surface] truncate w-full max-w-md">{previewData.domain}</h4>
+                              <p className="text-xs font-medium text-[--color-muted] break-all max-w-sm px-4 relative z-10">{previewData.url}</p>
+                              <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 bg-primary text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-md">
+                                 <Activity className="w-3 h-3 animate-pulse" /> News Analyzer Active
                               </div>
                            </div>
                         )}
 
-                        {previewData.type !== 'unsupported' && (
-                           <div className="bg-primary/5 p-6 rounded-[1.5rem] border border-primary/20 mt-4 flex items-start gap-4">
+                        {previewData && (
+                           <div className="bg-primary/5 p-6 rounded-[1.5rem] border border-primary/20 mt-4 flex items-start gap-4 shadow-inner">
                               <div className="p-2 bg-white rounded-lg shadow-sm text-primary shrink-0">
-                                 <FileText className="w-5 h-5" />
+                                 <Activity className="w-5 h-5 animate-pulse" />
                               </div>
                               <div>
-                                 <h4 className="font-bold text-sm tracking-widest uppercase text-primary mb-1">Claim Summary</h4>
+                                 <h4 className="font-display font-black text-sm tracking-widest uppercase text-primary mb-1">Awaiting Scan</h4>
                                  <p className="text-xs font-medium text-[--color-muted] leading-relaxed">
-                                    Our AI will automatically transcribe this media, extract the core claims, and cross-reference them in real-time upon verification.
+                                    Our AI will automatically scan this content deeply, extract the core claims, and verify their accuracy in real-time once you hit verify.
                                  </p>
                               </div>
                            </div>
@@ -185,8 +221,8 @@ const Verify = () => {
                      </div>
                   )}
 
-                  {inputText.trim().length > 0 && (
-                     <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 mt-6 animate-in fade-in slide-in-from-top-4 duration-500 relative">
+                  {inputText.trim().length > 0 && !previewData && (
+                     <div className="bg-slate-50 border border-slate-200 shadow-inner rounded-2xl p-6 mt-6 animate-in fade-in slide-in-from-top-4 duration-500 relative">
                         {(!('speechSynthesis' in window)) && (
                            <div className="mb-3 text-xs font-bold text-amber-600 bg-amber-100/50 px-3 py-1.5 rounded-lg flex items-center gap-2">
                               ⚠️ {t('verify.tts_not_supported', "Text-to-speech not supported")} (Try Chrome)

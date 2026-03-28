@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, Mail } from 'lucide-react';
+import { Eye, EyeOff, Mail, Mic } from 'lucide-react';
 
 const Login = () => {
     const { t } = useTranslation();
@@ -14,6 +14,29 @@ const Login = () => {
     const [showPwd, setShowPwd] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [activeVoiceField, setActiveVoiceField] = useState(null);
+
+    const handleVoiceType = (field) => {
+        window.speechSynthesis?.cancel();
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert("Voice recognition not supported. Please use Chrome.");
+            return;
+        }
+        setActiveVoiceField(field);
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.onresult = (e) => {
+            let text = e.results[0][0].transcript.toLowerCase();
+            // Try to fix "at" to "@" and "dot" to "."
+            text = text.replace(/\bat\b/g, '@').replace(/\bdot\b/g, '.').replace(/\s+/g, '');
+            if(field === 'email') setEmail(text);
+            if(field === 'password') setPassword(text);
+        };
+        recognition.onerror = () => setActiveVoiceField(null);
+        recognition.onend = () => setActiveVoiceField(null);
+        recognition.start();
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -39,10 +62,15 @@ const Login = () => {
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest text-[--color-muted] mb-2">{t('auth.email')}</label>
+                        <label className="block text-xs font-bold uppercase tracking-widest text-[--color-muted] mb-2 flex justify-between items-center">
+                            <span>{t('auth.email')}</span>
+                        </label>
                         <div className="relative">
                             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                            <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full pl-11 pr-4 py-3 bg-white border border-[--color-border] rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium text-[--color-on-surface]" placeholder="elon@x.com" />
+                            <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full pl-11 pr-12 py-3 bg-white border border-[--color-border] rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium text-[--color-on-surface]" placeholder="elon@x.com" />
+                            <button type="button" onClick={() => handleVoiceType('email')} className={`absolute right-4 top-1/2 -translate-y-1/2 hover:text-primary transition-colors ${activeVoiceField === 'email' ? 'text-rose-500 animate-pulse' : 'text-slate-400'}`}>
+                                <Mic className="w-4 h-4" />
+                            </button>
                         </div>
                     </div>
 
@@ -52,10 +80,15 @@ const Login = () => {
                             <Link to="/forgot-password" className="text-xs font-bold text-primary hover:underline">{t('auth.forgot_password')}</Link>
                         </div>
                         <div className="relative">
-                            <input type={showPwd ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)} className="w-full px-4 py-3 bg-white border border-[--color-border] rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium text-[--color-on-surface]" />
-                            <button type="button" onClick={() => setShowPwd(!showPwd)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary">
-                                {showPwd ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                            </button>
+                            <input type={showPwd ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)} className="w-full pl-4 pr-20 py-3 bg-white border border-[--color-border] rounded-xl outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium text-[--color-on-surface]" />
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-3 text-slate-400">
+                                <button type="button" onClick={() => handleVoiceType('password')} className={`hover:text-primary transition-colors ${activeVoiceField === 'password' ? 'text-rose-500 animate-pulse' : ''}`}>
+                                    <Mic className="w-4 h-4" />
+                                </button>
+                                <button type="button" onClick={() => setShowPwd(!showPwd)} className="hover:text-primary transition-colors">
+                                    {showPwd ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                </button>
+                            </div>
                         </div>
                     </div>
 
