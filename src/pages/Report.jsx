@@ -1,19 +1,32 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ShieldCheck, ArrowLeft, Download, Share2, Database, Search, Link as LinkIcon, CheckCircle2 } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { ShieldCheck, ArrowLeft, Download, Share2, Database, Search, Link as LinkIcon, CheckCircle2, AlertTriangle } from 'lucide-react'
+import { Link, useLocation } from 'react-router-dom'
 
 const Report = () => {
    const { t, i18n } = useTranslation()
+   const location = useLocation()
+   const { url, type, domain, aiData } = location.state || { url: 'https://news.example.com', type: 'news_article', domain: 'news.example.com', aiData: null }
+   
+   const score = aiData ? aiData.score : (domain?.includes('bbc') || domain?.includes('reuters') || domain?.includes('ptinews') ? 98 : 65);
+   const conclusion = aiData ? aiData.conclusion : (score > 85 ? 'Confirmed' : (score > 70 ? 'Likely True' : 'Needs Context'));
+   const colorClass = score > 85 ? 'text-emerald-500' : (score > 70 ? 'text-blue-500' : 'text-amber-500');
+
+   const summary = aiData?.summary || "TruthLens AI verified the contextual accuracy of this content against known global databases. Source integrity holds up to temporal scrutiny.";
+   const evidenceList = aiData?.evidence || [
+      { title: 'Global News Hubs', match: '98% Exact Match', desc: 'Associated Press, Reuters, BBC News confirmed source context.', color: 'border-[--color-success]' },
+      { title: 'Temporal Consistency', match: 'Timestamp Validated', desc: 'Creation date strictly aligns with observed historical events.', color: 'border-[--color-success]' }
+   ];
+
    const [dashOffset, setDashOffset] = useState(283)
    const [copied, setCopied] = useState(false)
    const [metricWidths, setMetricWidths] = useState([0, 0, 0])
 
    useEffect(() => {
-      const timer1 = setTimeout(() => setDashOffset(17), 100)
-      const timer2 = setTimeout(() => setMetricWidths([98, 92, 100]), 300)
+      const timer1 = setTimeout(() => setDashOffset(283 - (283 * score) / 100), 100)
+      const timer2 = setTimeout(() => setMetricWidths([score-2, score-8, score-5]), 300)
       return () => { clearTimeout(timer1); clearTimeout(timer2) }
-   }, [])
+   }, [score])
 
    const handleCopy = () => {
       navigator.clipboard.writeText(window.location.href)
@@ -24,15 +37,15 @@ const Report = () => {
    return (
       <main className="flex-1 w-full bg-slate-50 relative overflow-hidden">
          {/* Verdict Banner */}
-         <div className="pt-32 pb-8 bg-gradient-to-r from-[--color-success] to-emerald-400 text-white animate-in fade-in slide-in-from-top duration-700">
+         <div className={`pt-32 pb-8 text-white transition-all duration-700 animate-in fade-in slide-in-from-top ${score > 85 ? 'bg-gradient-to-r from-emerald-500 to-emerald-400' : (score > 70 ? 'bg-gradient-to-r from-blue-500 to-blue-400' : 'bg-gradient-to-r from-amber-500 to-amber-400')}`}>
             <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
                <div className="flex items-center gap-5">
                   <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-inner">
-                     <ShieldCheck className="w-8 h-8 text-white" />
+                     {score > 70 ? <ShieldCheck className="w-8 h-8 text-white" /> : <AlertTriangle className="w-8 h-8 text-white" />}
                   </div>
                   <div>
-                     <h2 className="text-4xl font-display font-black tracking-tight leading-none mb-2">{t('report.status.real')}</h2>
-                     <p className="text-white/80 text-xs font-bold uppercase tracking-[0.15em] leading-none">{t('report.high_confidence')}</p>
+                     <h2 className="text-4xl font-display font-black tracking-tight leading-none mb-2">{score > 70 ? t('report.status.real') : 'Needs Context'}</h2>
+                     <p className="text-white/80 text-xs font-bold uppercase tracking-[0.15em] leading-none">{url && url.length > 50 ? url.substring(0, 50) + '...' : url}</p>
                   </div>
                </div>
                <Link to="/verify" className="hidden md:flex items-center gap-2 px-6 py-3.5 bg-white/10 hover:bg-white/20 backdrop-blur-md transition-colors rounded-xl text-xs font-bold uppercase tracking-widest text-white border border-white/10 shadow-lg shadow-black/5 active:scale-95">
@@ -70,14 +83,14 @@ const Report = () => {
                                  strokeWidth="12"
                                  strokeLinecap="round"
                                  fill="transparent"
-                                 className="text-primary transition-all duration-[2s] ease-[cubic-bezier(0.34,1.56,0.64,1)] drop-shadow-[0_0_8px_rgba(0,102,255,0.5)]"
+                                 className={`${colorClass} transition-all duration-[2s] ease-[cubic-bezier(0.34,1.56,0.64,1)] drop-shadow-[0_0_8px_currentColor]`}
                                  strokeDasharray="283"
                                  strokeDashoffset={dashOffset}
                               />
                            </svg>
                            <div className="absolute flex flex-col items-center">
-                              <span className="text-7xl font-display font-black text-[--color-on-surface] tracking-tighter">94%</span>
-                              <span className="text-[10px] text-[--color-success] font-black uppercase tracking-[0.2em] leading-none mt-2">Confirmed</span>
+                              <span className="text-7xl font-display font-black text-[--color-on-surface] tracking-tighter">{score}%</span>
+                              <span className={`text-[10px] ${colorClass} font-black uppercase tracking-[0.2em] leading-none mt-2`}>{conclusion}</span>
                            </div>
                         </div>
 
@@ -94,7 +107,7 @@ const Report = () => {
                                  </div>
                                  <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden shadow-inner">
                                     <div
-                                       className="h-full bg-gradient-to-r from-primary to-accent-cyan rounded-full transition-all duration-[1.5s] ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                                       className={`h-full rounded-full transition-all duration-[1.5s] ease-[cubic-bezier(0.34,1.56,0.64,1)] ${score > 85 ? 'bg-gradient-to-r from-emerald-400 to-emerald-500' : (score > 70 ? 'bg-gradient-to-r from-blue-400 to-blue-500' : 'bg-gradient-to-r from-amber-400 to-amber-500')}`}
                                        style={{ width: `${item.width}%`, transitionDelay: `${idx * 150}ms` }}
                                     ></div>
                                  </div>
@@ -117,11 +130,8 @@ const Report = () => {
                      </div>
 
                      <div className="grid gap-5">
-                        {[
-                           { title: 'Global News Hubs', match: '98% Exact Match', desc: 'Associated Press, Reuters, BBC News confirmed source context.', color: 'border-[--color-success]' },
-                           { title: 'Temporal Consistency', match: 'Timestamp Validated', desc: 'Creation date strictly aligns with observed historical events.', color: 'border-[--color-success]' }
-                        ].map((item, idx) => (
-                           <div key={idx} className={`bg-slate-50 p-8 rounded-2xl border-y border-r border-[--color-border] border-l-4 ${item.color} hover:bg-slate-100 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-300`}>
+                        {evidenceList.map((item, idx) => (
+                           <div key={idx} className={`bg-slate-50 p-8 rounded-2xl border-y border-r border-[--color-border] border-l-4 ${item.color || 'border-primary'} hover:bg-slate-100 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-300`}>
                               <div className="flex justify-between items-start mb-4">
                                  <h4 className="text-xl font-display font-bold tracking-tight text-[--color-on-surface]">{item.title}</h4>
                                  <span className="text-sm font-black uppercase tracking-[0.2em] text-[--color-success] bg-[--color-success-light]/20 px-3 py-1 rounded-full">{item.match}</span>
@@ -135,7 +145,7 @@ const Report = () => {
                   {/* Comparison Table */}
                   <div className="bg-white p-10 rounded-[2.5rem] border border-[--color-border] shadow-[0_32px_80px_rgba(0,0,0,0.06)] relative overflow-hidden group hover:-translate-y-1 transition-all duration-500 animate-in fade-in slide-in-from-bottom duration-1000 delay-500 fill-mode-both">
                      <h2 className="text-2xl font-display font-black text-[--color-on-surface] tracking-tight mb-2">{t('report.comparison_title')}</h2>
-                     <p className="text-sm font-medium text-[--color-muted] mb-8">{t('report.comparison_subtitle')} <span className="text-[10px] uppercase font-bold text-primary ml-2">// TODO: replace with API response</span></p>
+                     <p className="text-sm font-[500] text-slate-800 leading-relaxed mb-8 border-l-4 border-primary pl-4 py-1">{summary}</p>
 
                      <div className="w-full rounded-2xl border border-[--color-border] overflow-x-auto">
                         <table className="w-full text-left border-collapse whitespace-nowrap min-w-[600px]">

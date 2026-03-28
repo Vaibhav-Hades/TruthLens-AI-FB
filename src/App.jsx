@@ -13,6 +13,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import ForgotPassword from './pages/ForgotPassword'
 import About from './pages/About'
+import ChatbotWidget from './components/ChatbotWidget'
 
 const App = () => {
   const { t } = useTranslation()
@@ -57,6 +58,7 @@ const App = () => {
               </div>
             </div>
           </footer>
+          <ChatbotWidget />
         </div>
       </Router>
     </AuthProvider>

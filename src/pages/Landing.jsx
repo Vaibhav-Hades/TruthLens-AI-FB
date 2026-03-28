@@ -119,23 +119,34 @@ const Landing = () => {
         </div>
       </div>
 
-      <div className="mt-8 border-y border-[--color-border] bg-white/50 backdrop-blur-md relative overflow-hidden flex py-8 px-6">
-        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[--color-surface] to-transparent z-10"></div>
+      <div className="mt-8 border-y border-[--color-border] bg-white/50 backdrop-blur-md relative overflow-hidden flex py-4 px-6">
+        <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[--color-surface] to-transparent z-10"></div>
         <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[--color-surface] to-transparent z-10"></div>
 
         <div className="max-w-6xl mx-auto w-full relative flex items-center">
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 z-20 px-3 py-1.5 bg-white backdrop-blur-md rounded-full border border-[--color-border] text-[10px] font-black uppercase tracking-widest text-[--color-muted] shadow-sm whitespace-nowrap hidden sm:block">
-            {t('hero.trusted')}
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 z-20 px-3 py-1.5 bg-red-600 text-white rounded-r-xl rounded-l-sm text-[10px] font-black uppercase tracking-widest shadow-md whitespace-nowrap hidden sm:flex items-center gap-2 border border-red-700">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+            </span>
+            PTI LIVE
           </div>
 
-          <div className="flex animate-marquee whitespace-nowrap gap-12 md:gap-24 items-center w-full">
-            {[...Array(2)].map((_, i) => (
+          <div className="flex animate-marquee whitespace-nowrap gap-8 items-center w-full pl-36">
+            {[...Array(3)].map((_, i) => (
               <React.Fragment key={i}>
-                <span className="font-display font-black text-2xl tracking-tighter text-slate-300 hover:text-slate-600 transition-colors cursor-default">GlobalNews</span>
-                <span className="font-display font-black text-2xl tracking-tighter text-slate-300 hover:text-slate-600 transition-colors cursor-default">DailyTribune</span>
-                <span className="font-display font-black text-2xl tracking-tighter text-slate-300 hover:text-slate-600 transition-colors cursor-default">TheObserver</span>
-                <span className="font-display font-black text-2xl tracking-tighter text-slate-300 hover:text-slate-600 transition-colors cursor-default">FactCheck.org</span>
-                <span className="font-display font-black text-2xl tracking-tighter text-slate-300 hover:text-slate-600 transition-colors cursor-default">AP Consensus</span>
+                <span className="font-body font-semibold text-sm text-[--color-on-surface] hover:text-primary transition-colors cursor-pointer">India dismisses report of Musk joining Modi-Trump call</span>
+                <span className="text-red-600/50 font-black">•</span>
+                <span className="font-body font-semibold text-sm text-[--color-on-surface] hover:text-primary transition-colors cursor-pointer">Zelensky agrees air defence cooperation with UAE, Qatar on Gulf tour</span>
+                <span className="text-red-600/50 font-black">•</span>
+                <span className="font-body font-semibold text-sm text-[--color-on-surface] hover:text-primary transition-colors cursor-pointer">Congress appoints 12 vice-presidents, 27 general secretaries in Himachal</span>
+                <span className="text-red-600/50 font-black">•</span>
+                <span className="font-body font-semibold text-sm text-[--color-on-surface] hover:text-primary transition-colors cursor-pointer">RCB beat Sunrisers Hyderabad by six wickets to win opening game of IPL</span>
+                <span className="text-red-600/50 font-black">•</span>
+                <span className="font-body font-semibold text-sm text-[--color-on-surface] hover:text-primary transition-colors cursor-pointer">India opposes China-led investment pact in WTO</span>
+                <span className="text-red-600/50 font-black">•</span>
+                <span className="font-body font-semibold text-sm text-[--color-on-surface] hover:text-primary transition-colors cursor-pointer">EC releases third supplementary voter list in Bengal</span>
+                <span className="text-red-600/50 font-black">•</span>
               </React.Fragment>
             ))}
           </div>
