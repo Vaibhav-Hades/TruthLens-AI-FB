@@ -6,14 +6,16 @@ import { Link, useLocation } from 'react-router-dom'
 const Report = () => {
    const { t, i18n } = useTranslation()
    const location = useLocation()
-   const { url, type, domain, aiData } = location.state || { url: 'https://news.example.com', type: 'news_article', domain: 'news.example.com', aiData: null }
-   
-   const score = aiData ? aiData.score : (domain?.includes('bbc') || domain?.includes('reuters') || domain?.includes('ptinews') ? 98 : 65);
-   const conclusion = aiData ? aiData.conclusion : (score > 85 ? 'Confirmed' : (score > 70 ? 'Likely True' : 'Needs Context'));
+   const { url, type, domain, result } = location.state || { url: 'https://news.example.com', type: 'news_article', domain: 'news.example.com', result: null }
+
+   const score = result?.confidence ?? (domain?.includes('bbc') || domain?.includes('reuters') || domain?.includes('ptinews') ? 98 : 65);
+   const conclusion = result?.prediction ?? (score > 85 ? 'REAL' : (score > 70 ? 'REAL' : 'NEEDS CONTEXT'));
    const colorClass = score > 85 ? 'text-emerald-500' : (score > 70 ? 'text-blue-500' : 'text-amber-500');
 
-   const summary = aiData?.summary || "TruthLens AI verified the contextual accuracy of this content against known global databases. Source integrity holds up to temporal scrutiny.";
-   const evidenceList = aiData?.evidence || [
+   const summary = result?.explanation || "TruthLens AI verified the contextual accuracy of this content against known global databases. Source integrity holds up to temporal scrutiny.";
+   const evidenceList = result?.matched_text ? [
+      { title: 'Backend Truth Extraction', match: 'Match Verified', desc: result.matched_text, color: 'border-[--color-success]' }
+   ] : [
       { title: 'Global News Hubs', match: '98% Exact Match', desc: 'Associated Press, Reuters, BBC News confirmed source context.', color: 'border-[--color-success]' },
       { title: 'Temporal Consistency', match: 'Timestamp Validated', desc: 'Creation date strictly aligns with observed historical events.', color: 'border-[--color-success]' }
    ];
@@ -24,7 +26,7 @@ const Report = () => {
 
    useEffect(() => {
       const timer1 = setTimeout(() => setDashOffset(283 - (283 * score) / 100), 100)
-      const timer2 = setTimeout(() => setMetricWidths([score-2, score-8, score-5]), 300)
+      const timer2 = setTimeout(() => setMetricWidths([score - 2, score - 8, score - 5]), 300)
       return () => { clearTimeout(timer1); clearTimeout(timer2) }
    }, [score])
 

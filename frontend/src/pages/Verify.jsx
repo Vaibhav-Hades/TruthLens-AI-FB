@@ -86,48 +86,34 @@ const Verify = () => {
    }, [inputText]);
 
    const handleScan = async (e) => {
-      e.preventDefault();
-      setIsScanning(true);
-      setScanStatus('Cross-referencing sources...');
+      e.preventDefault()
+      if (!inputText.trim()) return
+      setIsScanning(true)
+      setScanStatus('Cross-referencing sources...')
 
       try {
-         const API_KEY = "AIzaSyCOwDI1VvL4CmRUVR6NcpZN9nG_Fb_r9BY";
-         const prompt = `You are a professional fact-checker algorithm called TruthLens. Analyze this text or URL context strictly: "${inputText}". 
-Provide a realistic accuracy report strictly in this JSON format ONLY (no markdown or extra text):
-{
-  "score": <number 0-100 representing credibility>,
-  "conclusion": "Confirmed" | "Likely True" | "Needs Context" | "Fake",
-  "summary": "<3-4 sentence detailed factual summary. IF a URL or Post is provided, YOU MUST explicitly state the EXACT Date, Time, and Author/Creator of the post in your summary. Be highly accurate.>",
-  "evidence": [
-     { "title": "<e.g., Global News Hubs>", "match": "<e.g., 90% Match>", "desc": "<one sentence about the evidence>" }
-  ]
-}`;
-         
-         const payload = {
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.1, responseMimeType: 'application/json' },
-            tools: [{ googleSearch: {} }]
-         };
+         setScanStatus('Analyzing with TruthLens AI...')
+         const { analyzeAPI } = await import('../utils/api')
+         const result = await analyzeAPI.analyze(inputText)
 
-         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-         });
-
-         const data = await res.json();
-         let resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-         resultText = resultText.replace(/```json/gi, '').replace(/```/g, '').trim();
-         const analysisData = JSON.parse(resultText);
-
-         setScanStatus('Analyzing metadata...');
+         setScanStatus('Generating report...')
          setTimeout(() => {
-            navigate('/report', { state: { url: inputText, type: previewData?.type, domain: previewData?.domain, aiData: analysisData } });
-         }, 800);
+            navigate('/report', {
+               state: {
+                  url: inputText,
+                  type: previewData?.type,
+                  domain: previewData?.domain,
+                  result: result
+               }
+            })
+         }, 600)
       } catch (err) {
-         console.error(err);
-         // Fallback navigate
-         navigate('/report', { state: { url: inputText, type: previewData?.type, domain: previewData?.domain } });
+         console.error('Backend error:', err)
+         setScanStatus('Backend unavailable — make sure Spring Boot is running on port 8080')
+         setTimeout(() => {
+            setIsScanning(false)
+            setScanStatus('')
+         }, 3000)
       }
    }
 

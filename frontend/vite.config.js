@@ -4,4 +4,10 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  server: {
+    proxy: {
+      '/analyze': { target: 'http://localhost:8080', changeOrigin: true },
+      '/chat': { target: 'http://localhost:8080', changeOrigin: true }
+    }
+  }
 })
