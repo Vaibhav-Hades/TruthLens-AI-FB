@@ -2,13 +2,15 @@
   "nav": {
     "platform": "Platform",
     "solutions": "Solutions",
-    "api": "API",
+    "analytics": "Analytics",
     "about": "About",
     "get_started": "Get Started",
     "dashboard": "Dashboard",
     "history": "History"
   },
   "hero": {
+    "trusted": "Trusted by 48+ Newsrooms",
+    "scanning": "Scanning Global Neural Networks",
     "title_part1": "Verify Information",
     "title_part2": "Before You Believe It",
     "subtitle": "Fast, accurate, and multilingual fake news detection powered by AI to help you navigate information with confidence.",
@@ -17,6 +19,9 @@
     "badge": "AI-POWERED VERACITY ENGINE"
   },
   "verify": {
+    "scan_depth": "Scan Depth: Standard",
+    "deep_desc": "Multi-layered neural scan",
+    "source_desc": "Audit worldwide databases",
     "title": "Enter Your Claim",
     "subtitle": "Paste a URL or type a statement to begin the AI-forensic scan.",
     "placeholder": "Paste claim or URL here...",
@@ -29,6 +34,40 @@
     "toggle_source": "Source Verification"
   },
   "report": {
+    "comparison_title": "Claim vs Reality",
+    "comparison_subtitle": "Side-by-side breakdown of what was claimed vs verified facts",
+    "col_aspect": "Aspect",
+    "col_claimed": "What Was Claimed",
+    "col_reality": "Verified Reality",
+    "col_match": "Accuracy",
+    "match": "Match",
+    "no_match": "No Match",
+    "partial": "Partial",
+    "high_confidence": "High Confidence Scan",
+    "live_data": "Live Data",
+    "export": "Export",
+    "share": "Share",
+    "start_chat": "Start Chat",
+    "need_clarity": "Need More Clarity?",
+    "metrics": {
+      "neural": "Neural Sync",
+      "source": "Source Consensus",
+      "integrity": "Metadata Integrity"
+    },
+    "evidence": {
+      "global": "Global News Hubs",
+      "temporal": "Temporal Consistency",
+      "match": "98% Exact Match",
+      "timestamp": "Timestamp Validated",
+      "global_desc": "Associated Press, Reuters, BBC News confirmed source context.",
+      "temporal_desc": "Creation date strictly aligns with observed historical events."
+    },
+    "meta": {
+      "id": "Ingestion ID",
+      "depth": "Scan Depth",
+      "provider": "Provider",
+      "lang": "Language"
+    },
     "title": "Analysis Report",
     "confidence": "Forensic Confidence",
     "status": {
@@ -41,6 +80,14 @@
     "metadata": "Metadata Analysis"
   },
   "history": {
+    "search_placeholder": "Search past scans...",
+    "filter": "Filter",
+    "confidence": "Confidence",
+    "time": {
+      "hours_ago": "hrs ago",
+      "day_ago": "day ago",
+      "days_ago": "days ago"
+    },
     "title": "Recent Verifications",
     "new_btn": "New Scan",
     "empty": "No recent reports."
@@ -61,5 +108,116 @@
   },
   "footer": {
     "copy": "TruthLens AI. Engineering Truth through Digital Veracity."
+  },
+  "analytics": {
+    "total": "Total",
+    "charts": {
+      "verdict_subtitle": "Outcome distribution of all processed analysis",
+      "activity_subtitle": "Daily scan request volume over current period",
+      "confidence_subtitle": "Forensic confidence levels for processed links",
+      "language_subtitle": "Top languages utilized by volume",
+      "verdict_dist": "Verdict Distribution",
+      "activity": "Scan Activity",
+      "confidence": "Confidence Distribution",
+      "language": "Language Breakdown"
+    },
+    "days": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    },
+    "ranges": {
+      "r1": "0-20%",
+      "r2": "20-40%",
+      "r3": "40-60%",
+      "r4": "60-80%",
+      "r5": "80-100%"
+    },
+    "title": "Analytics Dashboard",
+    "subtitle": "Real-time insights from your verification history",
+    "filters": {
+      "today": "Today",
+      "week": "This Week",
+      "month": "This Month",
+      "all": "All Time"
+    },
+    "stats": {
+      "total": "Total Scans",
+      "real": "Verified Real",
+      "fake": "Verified Fake",
+      "misleading": "Misleading"
+    }
+  },
+  "auth": {
+    "login": "Sign In",
+    "register": "Create Account",
+    "logout": "Logout",
+    "email": "Email Address",
+    "password": "Password",
+    "confirm_password": "Confirm Password",
+    "full_name": "Full Name",
+    "forgot_password": "Forgot Password?",
+    "reset_password": "Send Reset Link",
+    "no_account": "Don't have an account?",
+    "have_account": "Already have an account?",
+    "sign_up": "Sign Up",
+    "sign_in": "Sign In",
+    "google": "Continue with Google",
+    "error_invalid": "Invalid email or password",
+    "error_exists": "Account already exists",
+    "error_mismatch": "Passwords do not match",
+    "success_reset": "Reset link sent to your email",
+    "loading": "Loading..."
+  },
+  "about": {
+    "label": "ABOUT",
+    "title": "Built to fight misinformation",
+    "subtitle": "TruthLens AI is an advanced forensic engine designed to analyze news veracity in real-time.",
+    "mission": {
+      "title": "Our Mission",
+      "desc": "To empower citizens by instantly verifying digital claims through multi-layered artificial intelligence protocols."
+    },
+    "vision": {
+      "title": "Our Vision",
+      "desc": "A future where algorithmic transparency builds a safer, deception-free digital internet ecosystem."
+    },
+    "stats": {
+      "sources": "Premium Newsrooms",
+      "languages": "Supported Languages",
+      "accuracy": "Forensic Accuracy"
+    },
+    "limitations": {
+      "title": "Current Limitations",
+      "item1": "Cannot verify cryptographically secure closed systems (encrypted chats).",
+      "item2": "Accuracy drops on heavily deep-faked audio without metadata.",
+      "item3": "Struggles with extreme local dialects lacking training data."
+    },
+    "future": {
+      "title": "Future Scope",
+      "i1": "Live Voice Analysis",
+      "i2": "Video Forensics",
+      "i3": "Browser Extension",
+      "i4": "WhatsApp Bot"
+    },
+    "hackathon": "Built for hackathon — ReelFact Pro / TruthLens AI",
+    "team": "Team Members"
+  },
+  "trending": {
+    "label": "LIVE TRENDS",
+    "title": "What's spreading right now",
+    "subtitle": "Top claims being fact-checked across platforms",
+    "shares": "shares",
+    "view_analysis": "View Analysis",
+    "view_all": "View All Trending",
+    "platforms": {
+      "whatsapp": "WhatsApp",
+      "twitter": "Twitter/X",
+      "instagram": "Instagram",
+      "youtube": "YouTube"
+    }
   }
 }
