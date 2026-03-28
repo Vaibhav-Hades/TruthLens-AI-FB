@@ -35,12 +35,12 @@ export const authAPI = {
 }
 
 export const analyzeAPI = {
-    // Calls Spring Boot POST /analyze
-    analyze: async (text) => {
-        const res = await fetch(`${BASE_URL}/analyze`, {
+    // Calls Spring Boot POST /api/analyze
+    analyze: async (content, type = 'text') => {
+        const res = await fetch(`${BASE_URL}/api/analyze`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text })
+            body: JSON.stringify({ content, type })
         })
         if (!res.ok) throw new Error(`Backend error: ${res.status}`)
         return res.json()

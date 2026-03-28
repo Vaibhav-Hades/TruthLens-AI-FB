@@ -94,7 +94,7 @@ const Verify = () => {
       try {
          setScanStatus('Analyzing with TruthLens AI...')
          const { analyzeAPI } = await import('../utils/api')
-         const result = await analyzeAPI.analyze(inputText)
+         const result = await analyzeAPI.analyze(inputText, previewData?.type || 'text')
 
          setScanStatus('Generating report...')
          setTimeout(() => {
