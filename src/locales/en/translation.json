@@ -1,0 +1,65 @@
+{
+  "nav": {
+    "platform": "Platform",
+    "solutions": "Solutions",
+    "api": "API",
+    "about": "About",
+    "get_started": "Get Started",
+    "dashboard": "Dashboard",
+    "history": "History"
+  },
+  "hero": {
+    "title_part1": "Verify Information",
+    "title_part2": "Before You Believe It",
+    "subtitle": "Fast, accurate, and multilingual fake news detection powered by AI to help you navigate information with confidence.",
+    "cta_main": "Verify Claim",
+    "cta_secondary": "Try Sandbox Demo",
+    "badge": "AI-POWERED VERACITY ENGINE"
+  },
+  "verify": {
+    "title": "Enter Your Claim",
+    "subtitle": "Paste a URL or type a statement to begin the AI-forensic scan.",
+    "placeholder": "Paste claim or URL here...",
+    "scan_btn": "Run Deep Scan",
+    "tabs": {
+      "text": "Text Input",
+      "url": "URL / Social"
+    },
+    "toggle_deep": "Enable AI Deep-Forensics",
+    "toggle_source": "Source Verification"
+  },
+  "report": {
+    "title": "Analysis Report",
+    "confidence": "Forensic Confidence",
+    "status": {
+      "real": "VERIFIED REAL",
+      "fake": "VERIFIED FAKE",
+      "misleading": "MISLEADING"
+    },
+    "details": "Evidence Breakdown",
+    "source_lineage": "Source Lineage",
+    "metadata": "Metadata Analysis"
+  },
+  "history": {
+    "title": "Recent Verifications",
+    "new_btn": "New Scan",
+    "empty": "No recent reports."
+  },
+  "features": {
+    "trust": {
+      "title": "Unrivaled Trust",
+      "desc": "Our algorithms are trained on audited datasets from premium journalistic institutions worldwide."
+    },
+    "accuracy": {
+      "title": "Milli-second Accuracy",
+      "desc": "Get real-time feedback with our high-concurrency engine designed for rapid information scaling."
+    },
+    "multilingual": {
+      "title": "Multilingual Support",
+      "desc": "Detect misinformation across 120+ languages with native-level semantic understanding."
+    }
+  },
+  "footer": {
+    "copy": "TruthLens AI. Engineering Truth through Digital Veracity."
+  }
+}
