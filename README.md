@@ -88,15 +88,6 @@ Ensure **MySQL** is running locally inside port `3306`. Create a database explic
 ```
 The Java layer boots and attaches to `http://localhost:8080`.
 
-### 2. Frontend React Environment 
-Make sure your root dir contains a functional `.env` file holding the appropriate secrets:
-```env
-VITE_API_URL=http://localhost:8080
-VITE_GEMINI_API_KEY=your_gemini_key_here
-VITE_TAVUS_API_KEY=your_tavus_key_here
-VITE_TAVUS_REPLICA_ID=your_replica_id
-```
-
 Spin up the system:
 ```bash
 npm install
