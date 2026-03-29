@@ -18,15 +18,15 @@ public class FakeNewsDatasetService {
     public void loadDataset() {
         try {
             BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(getClass().getResourceAsStream("/dataset.csv"))
-            );
+                    new InputStreamReader(getClass().getResourceAsStream("/dataset.csv")));
 
             String line;
             reader.readLine(); // skip header
 
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
-                if (parts.length < 2) continue;
+                if (parts.length < 2)
+                    continue;
 
                 String text = parts[0].trim().toLowerCase();
                 String label = parts[1].trim();
@@ -49,6 +49,11 @@ public class FakeNewsDatasetService {
         }
     }
 
-    public List<String> getFakeNews() { return fakeNews; }
-    public List<String> getRealNews() { return realNews; }
+    public List<String> getFakeNews() {
+        return fakeNews;
+    }
+
+    public List<String> getRealNews() {
+        return realNews;
+    }
 }

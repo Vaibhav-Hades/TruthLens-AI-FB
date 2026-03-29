@@ -80,6 +80,7 @@ const Navbar = () => {
         <Link to="/" className={navLinkClass('/')}>{t('nav.platform')}</Link>
         <Link to="/history" className={navLinkClass('/history')}>{t('nav.history')}</Link>
         <Link to="/analytics" className={navLinkClass('/analytics')}>{t('nav.analytics')}</Link>
+        <Link to="/trends" className={navLinkClass('/trends')}>📊 Trends</Link>
         <Link to="/about" className={navLinkClass('/about')}>{t('nav.about')}</Link>
       </div>
 

@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Search, Link as LinkIcon, FileText, Activity, Globe, Volume2 } from 'lucide-react'
+import { Search, Link as LinkIcon, FileText, Activity, Globe, Volume2, Tabs } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useGlobalToast } from '../context/ToastContext'
+import { analyzeAll, checkApiHealth } from '../utils/analysisApi'
+import { validateText } from '../utils/errorHandling'
+import FileUpload from '../components/FileUpload'
 
 const langCodeMap = {
    en: 'en-IN',
@@ -20,9 +24,11 @@ const langCodeMap = {
 const Verify = () => {
    const { t, i18n } = useTranslation()
    const navigate = useNavigate()
+   const { addToast } = useGlobalToast()
    const [inputText, setInputText] = useState('')
    const [isScanning, setIsScanning] = useState(false)
    const [scanStatus, setScanStatus] = useState('')
+   const [activeTab, setActiveTab] = useState('text') // 'text' or 'upload'
    const [deepScan, setDeepScan] = useState(true)
    const [sourceVerify, setSourceVerify] = useState(true)
 
@@ -87,34 +93,54 @@ const Verify = () => {
 
    const handleScan = async (e) => {
       e.preventDefault()
-      if (!inputText.trim()) return
+      if (!inputText.trim()) {
+         addToast('⚠️ Please enter text to verify', 'warning')
+         return
+      }
+
+      // Validate input
+      const validation = validateText(inputText)
+      if (!validation.valid) {
+         addToast(`⚠️ ${validation.error}`, 'warning')
+         return
+      }
+      
       setIsScanning(true)
-      setScanStatus('Cross-referencing sources...')
+      setScanStatus('Preparing analysis...')
 
       try {
-         setScanStatus('Analyzing with TruthLens AI...')
-         const { analyzeAPI } = await import('../utils/api')
-         const result = await analyzeAPI.analyze(inputText, previewData?.type || 'text')
+         // Check if backend is healthy
+         setScanStatus('Connecting to analysis engine...')
+         const health = await checkApiHealth()
+         if (!health) {
+            throw new Error('Backend unavailable')
+         }
 
+         setScanStatus('Analyzing content with AI...')
+         const result = await analyzeAll(inputText, 'en', true, true)
+         
          setScanStatus('Generating report...')
          setTimeout(() => {
+            addToast('✅ Analysis complete!', 'success')
             navigate('/report', {
                state: {
-                  url: inputText,
-                  type: previewData?.type,
-                  domain: previewData?.domain,
-                  result: result
+                  text: inputText,
+                  analysis: result
                }
             })
-         }, 600)
+         }, 500)
       } catch (err) {
-         console.error('Backend error:', err)
-         setScanStatus('Backend unavailable — make sure Spring Boot is running on port 8080')
-         setTimeout(() => {
-            setIsScanning(false)
-            setScanStatus('')
-         }, 3000)
+         console.error('Analysis error:', err)
+         addToast('❌ Analysis failed - Backend unavailable', 'error')
+         setIsScanning(false)
+         setScanStatus('')
       }
+   }
+
+   const handleTranscriptReady = (transcript) => {
+      setInputText(transcript)
+      setActiveTab('text')
+      addToast('📝 Transcript loaded - ready to verify', 'success')
    }
 
    return (
@@ -126,131 +152,175 @@ const Verify = () => {
             </div>
 
             <div className="bg-white/90 backdrop-blur-xl rounded-[2.5rem] border border-[--color-border] shadow-[0_32px_80px_rgba(0,0,0,0.06)] p-8 relative overflow-hidden">
+               {/* Tab Navigation */}
+               <div className="flex gap-4 mb-8 border-b border-slate-200">
+                  <button
+                     onClick={() => setActiveTab('text')}
+                     className={`pb-3 px-4 font-semibold transition-all ${
+                        activeTab === 'text'
+                           ? 'text-primary border-b-2 border-primary'
+                           : 'text-slate-500 hover:text-slate-700'
+                     }`}
+                  >
+                     📝 Text/URL
+                  </button>
+                  <button
+                     onClick={() => setActiveTab('upload')}
+                     className={`pb-3 px-4 font-semibold transition-all ${
+                        activeTab === 'upload'
+                           ? 'text-primary border-b-2 border-primary'
+                           : 'text-slate-500 hover:text-slate-700'
+                     }`}
+                  >
+                     🎥 Audio/Video
+                  </button>
+               </div>
+
                <div className="space-y-8">
-                  <div className="flex flex-col gap-6">
-                     <div className="flex items-center gap-3 ml-2">
-                        <div className="p-2.5 bg-primary/10 rounded-xl border border-primary/20 text-primary shadow-sm">
-                           <LinkIcon className="w-5 h-5" />
+                  {/* Text/URL Tab */}
+                  {activeTab === 'text' && (
+                     <div className="space-y-6">
+                        <div className="flex items-center gap-3 ml-2">
+                           <div className="p-2.5 bg-primary/10 rounded-xl border border-primary/20 text-primary shadow-sm">
+                              <LinkIcon className="w-5 h-5" />
+                           </div>
+                           <h3 className="text-2xl font-display font-black tracking-tight text-[--color-on-surface]">
+                              Paste a claim, video, or news link
+                           </h3>
                         </div>
-                        <h3 className="text-2xl font-display font-black tracking-tight text-[--color-on-surface]">
-                           Paste a claim, video, or news link
-                        </h3>
-                     </div>
 
-                     <div className="relative group">
-                        <div className="absolute -inset-0.5 bg-gradient-to-r from-primary via-accent-cyan to-primary rounded-[2rem] blur opacity-0 group-focus-within:opacity-100 transition duration-500 animate-[gradient-shift_3s_ease_infinite] bg-[length:200%_200%]"></div>
-                        <textarea
-                           value={inputText}
-                           onChange={(e) => setInputText(e.target.value)}
-                           placeholder="Drop a YouTube, Instagram, or News Website link, or type a claim..."
-                           className="relative w-full h-36 bg-white/80 backdrop-blur-md border border-[--color-border] focus:border-transparent rounded-3xl p-6 outline-none text-lg font-medium transition-all resize-none shadow-inner z-10 text-[--color-on-surface]"
-                        />
-                     </div>
-                  </div>
-
-                  {previewData && (
-                     <div className="animate-in fade-in slide-in-from-top-4 duration-500 fill-mode-both">
-                        {previewData.type === 'youtube' && (
-                           <div className="bg-slate-50 p-4 rounded-[2rem] border border-[--color-border] shadow-sm mt-4">
-                              <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-inner bg-slate-900 border border-[--color-border]">
-                                 <iframe
-                                    width="100%"
-                                    height="100%"
-                                    src={`https://www.youtube.com/embed/${previewData.id}`}
-                                    title="YouTube preview"
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                 ></iframe>
-                              </div>
-                           </div>
-                        )}
-                        {previewData.type === 'instagram' && (
-                           <div className="bg-slate-50 p-4 rounded-[2rem] border border-[--color-border] shadow-sm mt-4 flex justify-center">
-                              <div className="w-full max-w-sm bg-white rounded-2xl overflow-hidden shadow-inner border border-[--color-border]">
-                                 <iframe
-                                    src={`https://www.instagram.com/p/${previewData.id}/embed`}
-                                    className="w-full"
-                                    height="480"
-                                    frameBorder="0"
-                                    scrolling="no"
-                                    allowTransparency="true"
-                                 ></iframe>
-                              </div>
-                           </div>
-                        )}
-                        {previewData.type === 'news_article' && (
-                           <div className="bg-blue-50/50 p-6 rounded-[2rem] border border-blue-100 shadow-inner mt-4 flex flex-col items-center justify-center gap-2 text-center relative overflow-hidden">
-                              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full pointer-events-none"></div>
-                              <Globe className="w-10 h-10 text-primary/80 mb-2 drop-shadow-sm" />
-                              <h4 className="font-display font-black text-xl text-[--color-on-surface] truncate w-full max-w-md">{previewData.domain}</h4>
-                              <p className="text-xs font-medium text-[--color-muted] break-all max-w-sm px-4 relative z-10">{previewData.url}</p>
-                              <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 bg-primary text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-md">
-                                 <Activity className="w-3 h-3 animate-pulse" /> News Analyzer Active
-                              </div>
-                           </div>
-                        )}
+                        <div className="relative group">
+                           <div className="absolute -inset-0.5 bg-gradient-to-r from-primary via-accent-cyan to-primary rounded-[2rem] blur opacity-0 group-focus-within:opacity-100 transition duration-500 animate-[gradient-shift_3s_ease_infinite] bg-[length:200%_200%]"></div>
+                           <textarea
+                              value={inputText}
+                              onChange={(e) => setInputText(e.target.value)}
+                              placeholder="Drop a YouTube, Instagram, or News Website link, or type a claim..."
+                              className="relative w-full h-36 bg-white/80 backdrop-blur-md border border-[--color-border] focus:border-transparent rounded-3xl p-6 outline-none text-lg font-medium transition-all resize-none shadow-inner z-10 text-[--color-on-surface]"
+                           />
+                        </div>
 
                         {previewData && (
-                           <div className="bg-primary/5 p-6 rounded-[1.5rem] border border-primary/20 mt-4 flex items-start gap-4 shadow-inner">
-                              <div className="p-2 bg-white rounded-lg shadow-sm text-primary shrink-0">
-                                 <Activity className="w-5 h-5 animate-pulse" />
-                              </div>
-                              <div>
-                                 <h4 className="font-display font-black text-sm tracking-widest uppercase text-primary mb-1">Awaiting Scan</h4>
-                                 <p className="text-xs font-medium text-[--color-muted] leading-relaxed">
-                                    Our AI will automatically scan this content deeply, extract the core claims, and verify their accuracy in real-time once you hit verify.
-                                 </p>
-                              </div>
-                           </div>
-                        )}
-                     </div>
-                  )}
+                           <div className="animate-in fade-in slide-in-from-top-4 duration-500 fill-mode-both">
+                              {previewData.type === 'youtube' && (
+                                 <div className="bg-slate-50 p-4 rounded-[2rem] border border-[--color-border] shadow-sm mt-4">
+                                    <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-inner bg-slate-900 border border-[--color-border]">
+                                       <iframe
+                                          width="100%"
+                                          height="100%"
+                                          src={`https://www.youtube.com/embed/${previewData.id}`}
+                                          title="YouTube preview"
+                                          frameBorder="0"
+                                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                          allowFullScreen
+                                       ></iframe>
+                                    </div>
+                                 </div>
+                              )}
+                              {previewData.type === 'instagram' && (
+                                 <div className="bg-slate-50 p-4 rounded-[2rem] border border-[--color-border] shadow-sm mt-4 flex justify-center">
+                                    <div className="w-full max-w-sm bg-white rounded-2xl overflow-hidden shadow-inner border border-[--color-border]">
+                                       <iframe
+                                          src={`https://www.instagram.com/p/${previewData.id}/embed`}
+                                          className="w-full"
+                                          height="480"
+                                          frameBorder="0"
+                                          scrolling="no"
+                                          allowTransparency="true"
+                                       ></iframe>
+                                    </div>
+                                 </div>
+                              )}
+                              {previewData.type === 'news_article' && (
+                                 <div className="bg-blue-50/50 p-6 rounded-[2rem] border border-blue-100 shadow-inner mt-4 flex flex-col items-center justify-center gap-2 text-center relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full pointer-events-none"></div>
+                                    <Globe className="w-10 h-10 text-primary/80 mb-2 drop-shadow-sm" />
+                                    <h4 className="font-display font-black text-xl text-[--color-on-surface] truncate w-full max-w-md">{previewData.domain}</h4>
+                                    <p className="text-xs font-medium text-[--color-muted] break-all max-w-sm px-4 relative z-10">{previewData.url}</p>
+                                    <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 bg-primary text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-md">
+                                       <Activity className="w-3 h-3 animate-pulse" /> News Analyzer Active
+                                    </div>
+                                 </div>
+                              )}
 
-                  {inputText.trim().length > 0 && !previewData && (
-                     <div className="bg-slate-50 border border-slate-200 shadow-inner rounded-2xl p-6 mt-6 animate-in fade-in slide-in-from-top-4 duration-500 relative">
-                        {(!('speechSynthesis' in window)) && (
-                           <div className="mb-3 text-xs font-bold text-amber-600 bg-amber-100/50 px-3 py-1.5 rounded-lg flex items-center gap-2">
-                              ⚠️ {t('verify.tts_not_supported', "Text-to-speech not supported")} (Try Chrome)
-                           </div>
-                        )}
-                        <h4 className="flex items-center gap-2 font-black text-sm text-[--color-on-surface] uppercase tracking-widest mb-3">
-                           <FileText className="w-4 h-4 text-primary" /> Auto Summary
-                        </h4>
-                        <p className="text-[--color-on-surface] text-lg leading-relaxed font-medium mb-4 break-words">
-                           {generatedSummary}
-                        </p>
-
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-blue-100">
-                           <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                              <span>{wordCount} Words</span>
-                              <span>{charCount} Characters</span>
-                              {ttsState === 'playing' && (
-                                 <span className="text-primary flex items-center gap-1">
-                                    <Volume2 className="w-3 h-3 animate-pulse" /> {t('verify.listening_in', "Speaking in")} {i18n.language.toUpperCase()}
-                                 </span>
+                              {previewData && (
+                                 <div className="bg-primary/5 p-6 rounded-[1.5rem] border border-primary/20 mt-4 flex items-start gap-4 shadow-inner">
+                                    <div className="p-2 bg-white rounded-lg shadow-sm text-primary shrink-0">
+                                       <Activity className="w-5 h-5 animate-pulse" />
+                                    </div>
+                                    <div>
+                                       <h4 className="font-display font-black text-sm tracking-widest uppercase text-primary mb-1">Awaiting Scan</h4>
+                                       <p className="text-xs font-medium text-[--color-muted] leading-relaxed">
+                                          Our AI will automatically scan this content deeply, extract the core claims, and verify their accuracy in real-time once you hit verify.
+                                       </p>
+                                    </div>
+                                 </div>
                               )}
                            </div>
+                        )}
 
-                           {ttsState !== 'playing' ? (
-                              <button onClick={handleSpeak} className="flex items-center justify-center gap-3 px-6 py-3 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary-dark transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-95">
-                                 <Volume2 className="w-5 h-5" />
-                                 {ttsState === 'finished' ? t('verify.listen_again', "Listen Again") : t('verify.listen', "Listen to Summary")}
-                              </button>
-                           ) : (
-                              <button onClick={handleStop} className="flex items-center justify-center gap-3 px-6 py-3 bg-rose-500 text-white rounded-xl font-bold text-sm shadow-md active:scale-95">
-                                 <div className="flex items-end gap-0.5 h-5">
-                                    {[3, 5, 4, 6, 3].map((h, i) => (
-                                       <div key={i} className="w-1 bg-white rounded-full animate-[bounce_0.8s_ease-in-out_infinite]" style={{ height: `${h * 3}px`, animationDelay: `${i * 100}ms` }} />
-                                    ))}
+                        {inputText.trim().length > 0 && !previewData && (
+                           <div className="bg-slate-50 border border-slate-200 shadow-inner rounded-2xl p-6 mt-6 animate-in fade-in slide-in-from-top-4 duration-500 relative">
+                              {(!('speechSynthesis' in window)) && (
+                                 <div className="mb-3 text-xs font-bold text-amber-600 bg-amber-100/50 px-3 py-1.5 rounded-lg flex items-center gap-2">
+                                    ⚠️ {t('verify.tts_not_supported', "Text-to-speech not supported")} (Try Chrome)
                                  </div>
-                                 {t('verify.pause', "Pause")}
-                              </button>
-                           )}
+                              )}
+                              <h4 className="flex items-center gap-2 font-black text-sm text-[--color-on-surface] uppercase tracking-widest mb-3">
+                                 <FileText className="w-4 h-4 text-primary" /> Auto Summary
+                              </h4>
+                              <p className="text-[--color-on-surface] text-lg leading-relaxed font-medium mb-4 break-words">
+                                 {generatedSummary}
+                              </p>
+
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-blue-100">
+                                 <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                    <span>{wordCount} Words</span>
+                                    <span>{charCount} Characters</span>
+                                    {ttsState === 'playing' && (
+                                       <span className="text-primary flex items-center gap-1">
+                                          <Volume2 className="w-3 h-3 animate-pulse" /> {t('verify.listening_in', "Speaking in")} {i18n.language.toUpperCase()}
+                                       </span>
+                                    )}
+                                 </div>
+
+                                 {ttsState !== 'playing' ? (
+                                    <button onClick={handleSpeak} className="flex items-center justify-center gap-3 px-6 py-3 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary-dark transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-95">
+                                       <Volume2 className="w-5 h-5" />
+                                       {ttsState === 'finished' ? t('verify.listen_again', "Listen Again") : t('verify.listen', "Listen to Summary")}
+                                    </button>
+                                 ) : (
+                                    <button onClick={handleStop} className="flex items-center justify-center gap-3 px-6 py-3 bg-rose-500 text-white rounded-xl font-bold text-sm shadow-md active:scale-95">
+                                       <div className="flex items-end gap-0.5 h-5">
+                                          {[3, 5, 4, 6, 3].map((h, i) => (
+                                             <div key={i} className="w-1 bg-white rounded-full animate-[bounce_0.8s_ease-in-out_infinite]" style={{ height: `${h * 3}px`, animationDelay: `${i * 100}ms` }} />
+                                          ))}
+                                       </div>
+                                       {t('verify.pause', "Pause")}
+                                    </button>
+                                 )}
                         </div>
                      </div>
                   )}
+                     </div>
+                  )}
 
+                  {/* Upload Tab */}
+                  {activeTab === 'upload' && (
+                     <div className="space-y-6">
+                        <div className="flex items-center gap-3 ml-2">
+                           <div className="p-2.5 bg-purple-100 rounded-xl border border-purple-200 text-purple-600 shadow-sm">
+                              <FileText className="w-5 h-5" />
+                           </div>
+                           <h3 className="text-2xl font-display font-black tracking-tight text-[--color-on-surface]">
+                              Upload Audio or Video
+                           </h3>
+                        </div>
+                        <FileUpload onTranscriptReady={handleTranscriptReady} />
+                     </div>
+                  )}
+
+                  {/* Toggle Options */}
+                  {activeTab === 'text' && (
                   <div className="pt-6 grid md:grid-cols-2 gap-5">
                      <div
                         onClick={() => setDeepScan(!deepScan)}
@@ -301,6 +371,7 @@ const Verify = () => {
                         {isScanning && <div className="absolute inset-0 bg-primary/20 animate-[pulse-ring_2s_ease-out_infinite] rounded-[1.5rem]"></div>}
                      </button>
                   </div>
+                  )}
                </div>
             </div>
          </div>

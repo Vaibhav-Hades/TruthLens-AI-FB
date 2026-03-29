@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquare, X, Mic, Send, Volume2, VolumeX, Globe, Loader2, User, Bot } from 'lucide-react';
+import { MessageSquare, X, Mic, Send, Volume2, VolumeX, Globe, Loader2, User, Bot, Copy, Trash2, Download, Lightbulb } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useGlobalToast } from '../context/ToastContext';
+import { storage } from '../utils/storage';
+import { getSuggestions } from '../utils/suggestions';
 
 const SYSTEM_PROMPT = `You are Sam, a customer success specialist at TechHub. You are live on a video call with a real customer. Your voice is warm, casual, and confident. Keep responses extremely concise (1-3 sentences max).
 CRITICAL LANGUAGE RULE: You MUST always reply ENTIRELY in the exact same language the user speaks or writes to you. NOT A SINGLE WORD OF ENGLISH is allowed if the user speaks another language (like Telugu, Hindi, Spanish, etc). For example, if they speak Telugu, your entire response must be in Telugu script.
@@ -9,7 +12,7 @@ IF the user asks to open the analyzer or verify page, include exactly "[ACTION: 
 IF the user asks to go home or to the dashboard, include exactly "[ACTION: OPEN_HOME]".
 IF the user asks you to switch your language (e.g., "Speak Telugu", "हिंदी बात करो"), include "[ACTION: LANG_XX]" where XX is the 2-letter code (en, hi, te, ta, bn, es, fr, zh, ar) and reply entirely in that language.`;
 
-const API_KEY = "AIzaSyCOwDI1VvL4CmRUVR6NcpZN9nG_Fb_r9BY";
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 const languages = [
   { code: 'en-US', name: 'English' },
@@ -35,13 +38,18 @@ const getUI = (lang, key) => (uiText[lang] || uiText['en-US'])[key] || uiText['e
 const ChatbotWidget = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const { addToast } = useGlobalToast();
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedLang, setSelectedLang] = useState('en-US');
-  const [messages, setMessages] = useState([{ role: 'assistant', content: getUI('en-US', 'greeting') }]);
+  const [selectedLang, setSelectedLang] = useState(storage.getUserLanguage() || 'en-US');
+  const [messages, setMessages] = useState(() => {
+    const saved = storage.getChatHistory();
+    return saved.length > 0 ? saved : [{ role: 'assistant', content: getUI('en-US', 'greeting'), timestamp: new Date().toISOString() }];
+  });
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [ttsEnabled, setTtsEnabled] = useState(true);
+  const [copiedMsgId, setCopiedMsgId] = useState(null);
   const chatEndRef = useRef(null);
 
   // Auto-scroll
@@ -49,29 +57,107 @@ const ChatbotWidget = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isOpen]);
 
+  // Save messages to localStorage
+  useEffect(() => {
+    storage.saveChatHistory(messages);
+  }, [messages]);
+
+  // Save language preference
+  useEffect(() => {
+    storage.setUserLanguage(selectedLang);
+  }, [selectedLang]);
+
   // Clean up speech synthesis
   useEffect(() => {
     return () => window.speechSynthesis?.cancel();
   }, []);
 
   const handleSpeak = (text, lang) => {
-    if (!ttsEnabled || !window.speechSynthesis) return;
+    if (!ttsEnabled) {
+      console.log('❌ TTS disabled by user');
+      return;
+    }
+    
+    if (!window.speechSynthesis) {
+      console.error('❌ speechSynthesis not supported');
+      return;
+    }
+
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    
+    // Get available voices
+    let voices = window.speechSynthesis.getVoices();
+    if (voices.length === 0) {
+      console.warn('⚠️ No voices loaded, waiting for voices to load...');
+      window.speechSynthesis.onvoiceschanged = () => {
+        voices = window.speechSynthesis.getVoices();
+        console.log('✅ Voices loaded:', voices.length);
+      };
+    }
     
     // Find best matching voice
-    const voices = window.speechSynthesis.getVoices();
     const voicePrefix = lang.split('-')[0];
-    const voice = voices.find(v => v.lang.includes(lang) || v.lang.includes(voicePrefix));
-    if (voice) utterance.voice = voice;
+    const matchedVoice = voices.find(v => v.lang.includes(lang) || v.lang.startsWith(voicePrefix));
+    
+    if (matchedVoice) {
+      utterance.voice = matchedVoice;
+      console.log('✅ Voice selected:', matchedVoice.name, '(' + matchedVoice.lang + ')');
+    } else {
+      console.warn('⚠️ No matching voice for', lang, 'Available voices:', voices.map(v => v.lang).slice(0, 5));
+    }
+    
+    utterance.onstart = () => console.log('🔊 Speaking...');
+    utterance.onend = () => console.log('✅ Speech complete');
+    utterance.onerror = (e) => console.error('❌ Speech error:', e.error);
     
     window.speechSynthesis.speak(utterance);
   };
 
   const recognitionRef = useRef(null);
+
+  // Copy message to clipboard
+  const copyMessage = (text, index) => {
+    navigator.clipboard.writeText(text);
+    setCopiedMsgId(index);
+    addToast('✅ Message copied!', 'success', 2000);
+    setTimeout(() => setCopiedMsgId(null), 2000);
+  };
+
+  // Clear chat history
+  const clearChat = () => {
+    if (window.confirm('Are you sure you want to clear all chat messages?')) {
+      setMessages([{ role: 'assistant', content: getUI(selectedLang, 'greeting'), timestamp: new Date().toISOString() }]);
+      storage.clearChatHistory();
+      addToast('🗑️ Chat cleared', 'info', 2000);
+    }
+  };
+
+  // Export conversation
+  const exportConversation = () => {
+    const text = messages
+      .map((msg, i) => {
+        const time = new Date(msg.timestamp).toLocaleTimeString();
+        const role = msg.role === 'user' ? 'You' : 'Sam';
+        return `[${time}] ${role}:\n${msg.content}`;
+      })
+      .join('\n\n---\n\n');
+    
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `sam-chat-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    addToast('📥 Conversation exported!', 'success', 2000);
+  };
 
   const toggleListening = () => {
     if (isListening) {
@@ -129,7 +215,7 @@ const ChatbotWidget = () => {
     const textToSend = typeof textOverride === 'string' ? textOverride : inputText;
     if (!textToSend.trim()) return;
     
-    const newMessages = [...messages, { role: 'user', content: textToSend }];
+    const newMessages = [...messages, { role: 'user', content: textToSend, timestamp: new Date().toISOString() }];
     setMessages(newMessages);
     setInputText('');
     setIsLoading(true);
@@ -186,13 +272,25 @@ const ChatbotWidget = () => {
              reply = reply.replace(langMatch[0], '').trim();
           }
 
-          setMessages([...newMessages, { role: 'assistant', content: reply }]);
-          handleSpeak(reply, finalLang);
+          setMessages([...newMessages, { role: 'assistant', content: reply, timestamp: new Date().toISOString() }]);
+          addToast('✅ Message sent!', 'success', 1500);
+          
+          // Force enable TTS and speak immediately
+          console.log('📢 Bot responding, triggering speech...');
+          setTtsEnabled(true); // Make sure TTS is enabled
+          
+          // Small delay to ensure state updates
+          setTimeout(() => {
+            console.log('🔊 Now speaking:', reply.substring(0, 50) + '...');
+            handleSpeak(reply, finalLang);
+          }, 100);
        } else {
-          setMessages([...newMessages, { role: 'assistant', content: `Oops! Generated response format error.` }]);
+          setMessages([...newMessages, { role: 'assistant', content: `Oops! Generated response format error.`, timestamp: new Date().toISOString() }]);
+          addToast('❌ Response format error', 'error', 2000);
        }
     } catch (err) {
-       setMessages([...newMessages, { role: 'assistant', content: `Connectivity Issue: ${err.message}. Please check your API Key.` }]);
+       setMessages([...newMessages, { role: 'assistant', content: `Connectivity Issue: ${err.message}. Please check your API Key.`, timestamp: new Date().toISOString() }]);
+       addToast('❌ ' + err.message, 'error', 3000);
     } finally {
        setIsLoading(false);
     }
@@ -227,11 +325,36 @@ const ChatbotWidget = () => {
               </div>
               <div className="flex items-center gap-1 bg-slate-100/50 p-1 rounded-full border border-slate-200/50">
                 <button 
+                  onClick={exportConversation}
+                  className="p-1.5 rounded-full text-slate-400 hover:text-green-600 hover:bg-green-50 transition-colors"
+                  title="Export Chat"
+                >
+                  <Download className="w-4 h-4" />
+                </button>
+                <button 
+                  onClick={clearChat}
+                  className="p-1.5 rounded-full text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                  title="Clear Chat"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+                <button 
                   onClick={() => { setTtsEnabled(!ttsEnabled); window.speechSynthesis?.cancel(); }} 
                   className={`p-1.5 rounded-full transition-colors ${ttsEnabled ? 'bg-white text-primary shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                   title={ttsEnabled ? "Mute Voice" : "Enable Voice"}
                 >
                   {ttsEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                </button>
+                <button 
+                  onClick={() => {
+                    console.log('🔊 Testing voice...');
+                    const testMsg = selectedLang.startsWith('en') ? 'Voice test successful' : 'Audio test working';
+                    handleSpeak(testMsg, selectedLang);
+                  }} 
+                  className="p-1.5 rounded-full text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                  title="Test Voice"
+                >
+                  🔊
                 </button>
                 <button 
                   onClick={() => setIsOpen(false)} 
@@ -258,14 +381,25 @@ const ChatbotWidget = () => {
           </div>
 
           {/* Chat Area */}
-          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-slate-50/50">
+          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-slate-50/50">
             {messages.map((msg, i) => (
-               <div key={i} className={`flex items-end gap-2 max-w-[85%] ${msg.role === 'user' ? 'ml-auto flex-row-reverse' : ''}`}>
+               <div key={i} className={`flex items-end gap-2 max-w-[85%] group ${msg.role === 'user' ? 'ml-auto flex-row-reverse' : ''}`}>
                   <div className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center shadow-sm ${msg.role === 'user' ? 'bg-slate-200' : 'bg-primary'}`}>
                      {msg.role === 'user' ? <User className="w-3 h-3 text-slate-500" /> : <Bot className="w-3 h-3 text-white" />}
                   </div>
-                  <div className={`p-3.5 rounded-2xl text-[15px] leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-slate-800 text-white rounded-br-sm' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-sm'}`}>
+                  <div className="flex flex-col gap-1">
+                    <div className={`p-3.5 rounded-2xl text-[15px] leading-relaxed shadow-sm relative ${msg.role === 'user' ? 'bg-slate-800 text-white rounded-br-sm' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-sm'}`}>
                      {msg.content}
+                     <button 
+                       onClick={() => copyMessage(msg.content, i)}
+                       className={`absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-full ${msg.role === 'user' ? 'bg-slate-700 hover:bg-slate-600 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'} shadow-sm`}
+                     >
+                       <Copy className="w-3 h-3" />
+                     </button>
+                    </div>
+                    <span className={`text-[11px] font-medium px-1 ${msg.role === 'user' ? 'text-slate-500 text-right' : 'text-slate-400'}`}>
+                      {new Date(msg.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
                   </div>
                </div>
             ))}
@@ -280,6 +414,26 @@ const ChatbotWidget = () => {
                      <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></div>
                   </div>
                </div>
+            )}
+            {!isLoading && messages.length <= 1 && (
+              <div className="flex-1 flex flex-col items-center justify-center gap-4 py-8">
+                <Lightbulb className="w-8 h-8 text-slate-300" />
+                <p className="text-sm text-slate-500 font-medium text-center">Try asking me something...</p>
+                <div className="grid grid-cols-2 gap-2 w-full">
+                  {getSuggestions(selectedLang).map((suggestion, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        console.log('📝 Suggestion clicked:', suggestion);
+                        sendMessage(suggestion);
+                      }}
+                      className="text-xs px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:border-primary hover:bg-primary/5 hover:text-primary transition-all active:scale-95 whitespace-nowrap overflow-hidden text-ellipsis"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              </div>
             )}
             <div ref={chatEndRef} />
           </div>

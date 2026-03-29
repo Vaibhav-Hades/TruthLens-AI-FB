@@ -1,16 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Search, Filter, ShieldCheck, AlertTriangle, XCircle, Plus, FileText, Activity, Link as LinkIcon, ArrowRight } from 'lucide-react'
+import { Search, Filter, ShieldCheck, AlertTriangle, XCircle, Plus, FileText, Activity, Link as LinkIcon, ArrowRight, Download, Trash2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-
-const mockHistory = [
-   { id: 1, text: "Global markets crash amid new regulations restricting international trade...", status: "misleading", confidence: 68, date: "2 hrs ago", type: "text" },
-   { id: 2, text: "https://news.example.com/breaking/10928/stock-market-crash", status: "fake", confidence: 91, date: "5 hrs ago", type: "url" },
-   { id: 3, text: "New scientific breakthrough in quantum computing promises faster processing...", status: "real", confidence: 95, date: "1 day ago", type: "text" },
-   { id: 4, text: "Politician caught on tape admitting to widespread electoral fraud operations in 2024...", status: "fake", confidence: 88, date: "2 days ago", type: "text" },
-   { id: 5, text: "Health experts warn of incoming severe flu season variant affecting major cities...", status: "misleading", confidence: 72, date: "3 days ago", type: "text" },
-   { id: 6, text: "https://research.example.org/study-findings-2024", status: "real", confidence: 98, date: "4 days ago", type: "url" }
-]
+import { useGlobalToast } from '../context/ToastContext'
+import { storage } from '../utils/storage'
 
 const statusConfig = {
    real: { icon: <ShieldCheck className="w-3.5 h-3.5 stroke-[3]" />, color: 'text-emerald-600', bg: 'bg-emerald-500/10', border: 'border-emerald-500', glow: 'hover:shadow-[0_16px_40px_rgba(16,185,129,0.12)]' },
@@ -20,9 +13,61 @@ const statusConfig = {
 
 const History = () => {
    const { t } = useTranslation()
+   const { addToast } = useGlobalToast()
    const [searchTerm, setSearchTerm] = useState('')
+   const [statusFilter, setStatusFilter] = useState('all')
+   const [typeFilter, setTypeFilter] = useState('all')
+   const [history, setHistory] = useState([])
 
-   const filtered = mockHistory.filter(item => item.text.toLowerCase().includes(searchTerm.toLowerCase()))
+   // Load history from localStorage on mount
+   useEffect(() => {
+      const saved = storage.getVerificationHistory()
+      setHistory(saved)
+   }, [])
+
+   const deleteItem = (id) => {
+      if (window.confirm('Delete this verification record?')) {
+         storage.deleteVerificationHistoryItem(id)
+         setHistory(history.filter(item => item.id !== id))
+         addToast('🗑️ Item deleted', 'info', 2000)
+      }
+   }
+
+   const clearAllHistory = () => {
+      if (window.confirm('Delete all verification history? This cannot be undone.')) {
+         storage.clearVerificationHistory()
+         setHistory([])
+         addToast('🗑️ All history cleared', 'warning', 2000)
+      }
+   }
+
+   const exportAsCSV = () => {
+      const csv = storage.exportHistoryAsCSV(history)
+      storage.downloadCSV(csv)
+      addToast('📥 History exported as CSV', 'success', 2000)
+   }
+
+   const filtered = history.filter(item => {
+      const matchesSearch = (item.text || item.url || '').toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesStatus = statusFilter === 'all' || item.status === statusFilter
+      const matchesType = typeFilter === 'all' || item.type === typeFilter
+      return matchesSearch && matchesStatus && matchesType
+   })
+
+   const formatDate = (timestamp) => {
+      if (!timestamp) return 'No date'
+      const date = new Date(timestamp)
+      const now = new Date()
+      const diff = now - date
+      const hours = Math.floor(diff / 3600000)
+      const days = Math.floor(diff / 86400000)
+      
+      if (hours < 1) return 'Just now'
+      if (hours < 24) return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`
+      if (days < 1) return '1 day ago'
+      if (days < 7) return `${days} days ago`
+      return date.toLocaleDateString()
+   }
 
    return (
       <main className="flex-1 w-full relative mesh-bg min-h-screen pt-40 pb-20 px-6">
@@ -36,6 +81,65 @@ const History = () => {
                   <Plus className="w-5 h-5" /> {t('history.new_btn')}
                </Link>
             </div>
+
+            {history.length > 0 && (
+               <div className="space-y-6 mb-8">
+                  {/* Search and Filters */}
+                  <div className="grid md:grid-cols-4 gap-4">
+                     <div className="md:col-span-2 relative">
+                        <Search className="absolute left-4 top-3.5 w-5 h-5 text-slate-400" />
+                        <input
+                           type="text"
+                           placeholder="Search verifications..."
+                           value={searchTerm}
+                           onChange={(e) => setSearchTerm(e.target.value)}
+                           className="w-full pl-12 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                        />
+                     </div>
+                     <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="px-4 py-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-primary text-slate-700 font-medium"
+                     >
+                        <option value="all">All Status</option>
+                        <option value="real">✅ Real</option>
+                        <option value="fake">❌ Fake</option>
+                        <option value="misleading">⚠️ Misleading</option>
+                     </select>
+                     <select
+                        value={typeFilter}
+                        onChange={(e) => setTypeFilter(e.target.value)}
+                        className="px-4 py-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-primary text-slate-700 font-medium"
+                     >
+                        <option value="all">All Types</option>
+                        <option value="text">📝 Text</option>
+                        <option value="url">🔗 URL</option>
+                        <option value="video">🎥 Video</option>
+                     </select>
+                  </div>
+
+                  {/* Export and Clear Actions */}
+                  <div className="flex flex-wrap gap-3">
+                     <button 
+                        onClick={exportAsCSV}
+                        className="flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-lg text-green-700 hover:bg-green-100 transition-colors text-sm font-medium"
+                     >
+                        <Download className="w-4 h-4" /> Export CSV
+                     </button>
+                     <button 
+                        onClick={clearAllHistory}
+                        className="flex items-center gap-2 px-4 py-2 bg-rose-50 border border-rose-200 rounded-lg text-rose-700 hover:bg-rose-100 transition-colors text-sm font-medium"
+                     >
+                        <Trash2 className="w-4 h-4" /> Clear All
+                     </button>
+                  </div>
+
+                  {/* Results Count */}
+                  <div className="text-sm text-slate-600">
+                     Showing {filtered.length} of {history.length} results
+                  </div>
+               </div>
+            )}
 
             <div className="flex flex-col md:flex-row gap-4 mb-10 animate-in fade-in zoom-in duration-1000 delay-200 fill-mode-both">
                <div className="relative flex-1 group">
@@ -51,9 +155,27 @@ const History = () => {
                      />
                   </div>
                </div>
-               <button className="bg-white/90 backdrop-blur-xl px-8 py-4 rounded-[1.5rem] border border-[--color-border] flex items-center justify-center gap-3 text-xs font-bold uppercase tracking-widest hover:bg-slate-50 transition-colors shadow-sm text-slate-600 active:scale-95">
-                  <Filter className="w-4 h-4" /> {t('history.filter')}
-               </button>
+               <div className="flex gap-2">
+                  <select
+                     value={statusFilter}
+                     onChange={(e) => setStatusFilter(e.target.value)}
+                     className="px-4 py-3 rounded-[1.5rem] border border-[--color-border] bg-white text-sm font-medium text-slate-600 hover:border-primary/50 transition-colors cursor-pointer"
+                  >
+                     <option value="all">All Status</option>
+                     <option value="real">✓ Real</option>
+                     <option value="fake">✗ Fake</option>
+                     <option value="misleading">⚠ Misleading</option>
+                  </select>
+                  <select
+                     value={typeFilter}
+                     onChange={(e) => setTypeFilter(e.target.value)}
+                     className="px-4 py-3 rounded-[1.5rem] border border-[--color-border] bg-white text-sm font-medium text-slate-600 hover:border-primary/50 transition-colors cursor-pointer"
+                  >
+                     <option value="all">All Types</option>
+                     <option value="text">📝 Text</option>
+                     <option value="url">🔗 URL</option>
+                  </select>
+               </div>
             </div>
 
             {filtered.length === 0 ? (
@@ -69,37 +191,42 @@ const History = () => {
                   {filtered.map((item, idx) => {
                      const config = statusConfig[item.status]
 
-                     let dateTranslated = item.date;
-                     if (item.date.includes('hrs')) dateTranslated = `2 ${t('history.time.hours_ago')}`;
-                     else if (item.date.includes('1 day')) dateTranslated = `1 ${t('history.time.day_ago')}`;
-                     else if (item.date.includes('2 days')) dateTranslated = `2 ${t('history.time.days_ago')}`;
-                     else if (item.date.includes('3 days')) dateTranslated = `3 ${t('history.time.days_ago')}`;
-                     else if (item.date.includes('4 days')) dateTranslated = `4 ${t('history.time.days_ago')}`;
-
                      return (
-                        <Link key={item.id} to="/report" className={`bg-white rounded-[1.5rem] border border-[--color-border] border-l-4 ${config.border} flex flex-col justify-between p-6 shadow-sm hover:-translate-y-1 hover:shadow-lg transition-all duration-200 min-h-[220px] animate-in fade-in slide-in-from-bottom duration-700 fill-mode-both group ${config.glow}`} style={{ animationDelay: `${300 + (idx * 100)}ms` }}>
-                           <div className="flex items-center justify-between mb-4">
-                              <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.1em] shadow-sm ${config.bg} ${config.color}`}>
-                                 {config.icon} {t(`report.status.${item.status}`)}
-                              </span>
-                              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5 shrink-0">
-                                 {item.type === 'url' ? <LinkIcon className="w-3.5 h-3.5" /> : <FileText className="w-3.5 h-3.5" />}
-                                 {dateTranslated}
-                              </span>
+                        <div key={item.id} className={`bg-white rounded-[1.5rem] border border-[--color-border] border-l-4 ${config.border} flex flex-col justify-between p-6 shadow-sm hover:-translate-y-1 hover:shadow-lg transition-all duration-200 min-h-[220px] animate-in fade-in slide-in-from-bottom duration-700 fill-mode-both group ${config.glow}`} style={{ animationDelay: `${300 + (idx * 100)}ms` }}>
+                           <div>
+                              <div className="flex items-center justify-between mb-4">
+                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.1em] shadow-sm ${config.bg} ${config.color}`}>
+                                    {config.icon} {t(`report.status.${item.status}`)}
+                                 </span>
+                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5 shrink-0">
+                                    {item.type === 'url' ? <LinkIcon className="w-3.5 h-3.5" /> : <FileText className="w-3.5 h-3.5" />}
+                                    {formatDate(item.timestamp)}
+                                 </span>
+                              </div>
+
+                              <p className="line-clamp-3 text-[--color-on-surface] font-bold text-sm mb-6 leading-snug">{item.text || item.url}</p>
+
+                              <div className="flex items-end justify-between mb-4">
+                                 <div>
+                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">{t('history.confidence')}</div>
+                                    <div className="text-3xl font-display font-black gradient-text tracking-tighter leading-none">{item.confidence || '—'}%</div>
+                                 </div>
+                              </div>
                            </div>
 
-                           <p className="line-clamp-2 text-[--color-on-surface] font-bold text-[1.05rem] mb-8 leading-snug">{item.text}</p>
-
-                           <div className="flex items-end justify-between mt-auto">
-                              <div>
-                                 <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">{t('history.confidence')}</div>
-                                 <div className="text-5xl font-display font-black gradient-text tracking-tighter leading-none">{item.confidence}%</div>
-                              </div>
-                              <div className="w-9 h-9 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 flex-shrink-0 group-hover:bg-primary group-hover:border-primary group-hover:text-white transition-all shadow-sm">
-                                 <ArrowRight className="w-4 h-4" />
-                              </div>
+                           <div className="flex items-center gap-2 pt-4 border-t border-slate-100">
+                              <Link to="/report" state={{ ...item }} className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg text-xs font-bold uppercase tracking-widest transition-colors active:scale-95">
+                                 <ArrowRight className="w-3.5 h-3.5" /> View
+                              </Link>
+                              <button 
+                                 onClick={() => deleteItem(item.id)}
+                                 className="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition-colors"
+                                 title="Delete"
+                              >
+                                 <Trash2 className="w-4 h-4" />
+                              </button>
                            </div>
-                        </Link>
+                        </div>
                      )
                   })}
                </div>

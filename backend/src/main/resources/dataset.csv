@@ -1,9 +1,5 @@
-"text,label"
-"earth is flat,FAKE"
-"5g spreads virus,FAKE"
-"moon landing is fake,FAKE"
-"fake vaccine causes death,FAKE"
-"india launches satellite,REAL"
-"covid vaccine approved,REAL"
-"economic growth rises,REAL"
-"scientists discover water,REAL"
+id,topic,facts,source
+1,COVID lockdown India 2020,India announced nationwide lockdown on March 24 2020 by PM Modi,PIB India
+2,Election results India 2024,BJP won 2024 general elections NDA secured majority,Election Commission
+3,UPI payments India,UPI was launched in 2016 by NPCI and is free to use,NPCI Official
+4,Demonetization India,Demonetization was announced on November 8 2016 by PM Modi,RBI Official
