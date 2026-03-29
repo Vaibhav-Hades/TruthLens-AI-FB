@@ -6,7 +6,7 @@ import com.example.truthlensai.service.AnalysisService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/analyze")
+@RequestMapping("/api/analyze")
 @CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", methods = { RequestMethod.POST, RequestMethod.GET,
         RequestMethod.OPTIONS })
 public class AnalyzeController {
@@ -19,6 +19,6 @@ public class AnalyzeController {
 
     @PostMapping
     public AnalyzeResponse analyze(@RequestBody AnalyzeRequest request) {
-        return analysisService.analyze(request.getText());
+        return analysisService.analyze(request.getContent(), request.getType());
     }
 }
