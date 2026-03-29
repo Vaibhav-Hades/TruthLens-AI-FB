@@ -1,0 +1,89 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< com.example:truthlensai >-----------------------
+[INFO] Building truthlensai 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ truthlensai ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ truthlensai ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 12 source files with javac [debug release 17] to target\classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[3,27] package jakarta.persistence does not exist
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[4,27] package jakarta.persistence does not exist
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[5,27] package jakarta.persistence does not exist
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[6,27] package jakarta.persistence does not exist
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[7,27] package jakarta.persistence does not exist
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[8,27] package jakarta.persistence does not exist
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[10,2] cannot find symbol
+  symbol: class Entity
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[11,2] cannot find symbol
+  symbol: class Table
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/repository/AnalysisResultRepository.java:[4,47] package org.springframework.data.jpa.repository does not exist
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/repository/AnalysisResultRepository.java:[8,51] cannot find symbol
+  symbol: class JpaRepository
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[14,6] cannot find symbol
+  symbol:   class Id
+  location: class com.example.truthlensai.model.AnalysisResult
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[15,6] cannot find symbol
+  symbol:   class GeneratedValue
+  location: class com.example.truthlensai.model.AnalysisResult
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[15,32] cannot find symbol
+  symbol:   variable GenerationType
+  location: class com.example.truthlensai.model.AnalysisResult
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[18,6] cannot find symbol
+  symbol:   class Column
+  location: class com.example.truthlensai.model.AnalysisResult
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[26,6] cannot find symbol
+  symbol:   class Column
+  location: class com.example.truthlensai.model.AnalysisResult
+[INFO] 15 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.243 s
+[INFO] Finished at: 2026-03-29T03:47:50+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project truthlensai: Compilation failure: Compilation failure: 
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[3,27] package jakarta.persistence does not exist
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[4,27] package jakarta.persistence does not exist
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[5,27] package jakarta.persistence does not exist
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[6,27] package jakarta.persistence does not exist
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[7,27] package jakarta.persistence does not exist
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[8,27] package jakarta.persistence does not exist
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[10,2] cannot find symbol
+[ERROR]   symbol: class Entity
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[11,2] cannot find symbol
+[ERROR]   symbol: class Table
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/repository/AnalysisResultRepository.java:[4,47] package org.springframework.data.jpa.repository does not exist
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/repository/AnalysisResultRepository.java:[8,51] cannot find symbol
+[ERROR]   symbol: class JpaRepository
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[14,6] cannot find symbol
+[ERROR]   symbol:   class Id
+[ERROR]   location: class com.example.truthlensai.model.AnalysisResult
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[15,6] cannot find symbol
+[ERROR]   symbol:   class GeneratedValue
+[ERROR]   location: class com.example.truthlensai.model.AnalysisResult
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[15,32] cannot find symbol
+[ERROR]   symbol:   variable GenerationType
+[ERROR]   location: class com.example.truthlensai.model.AnalysisResult
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[18,6] cannot find symbol
+[ERROR]   symbol:   class Column
+[ERROR]   location: class com.example.truthlensai.model.AnalysisResult
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/model/AnalysisResult.java:[26,6] cannot find symbol
+[ERROR]   symbol:   class Column
+[ERROR]   location: class com.example.truthlensai.model.AnalysisResult
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

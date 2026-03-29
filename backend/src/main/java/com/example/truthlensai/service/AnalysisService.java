@@ -2,6 +2,8 @@ package com.example.truthlensai.service;
 
 import com.example.truthlensai.dataset.FakeNewsDatasetService;
 import com.example.truthlensai.model.AnalyzeResponse;
+import com.example.truthlensai.model.AnalysisResult;
+import com.example.truthlensai.repository.AnalysisResultRepository;
 import com.example.truthlensai.utils.TextUtils;
 import org.springframework.stereotype.Service;
 
@@ -11,15 +13,17 @@ import java.util.List;
 public class AnalysisService {
 
     private final FakeNewsDatasetService datasetService;
+    private final AnalysisResultRepository repository;
 
-    public AnalysisService(FakeNewsDatasetService datasetService) {
+    public AnalysisService(FakeNewsDatasetService datasetService, AnalysisResultRepository repository) {
         this.datasetService = datasetService;
+        this.repository = repository;
     }
 
-    public AnalyzeResponse analyze(String text) {
-        System.out.println("INPUT TEXT: " + text);
+    public AnalyzeResponse analyze(String content, String type) {
+        System.out.println("INPUT TEXT: " + content);
 
-        List<String> tokens = TextUtils.tokenize(text);
+        List<String> tokens = TextUtils.tokenize(content);
         System.out.println("TOKENS: " + tokens);
 
         double fakeScore = 0;
@@ -67,6 +71,17 @@ public class AnalysisService {
             matchedText = "";
         }
 
-        return new AnalyzeResponse(prediction, confidence, explanation, matchedText);
+        AnalysisResult entity = new AnalysisResult(content, type, prediction, confidence, explanation, matchedText);
+        repository.save(entity);
+
+        // Find similar historical claims
+        List<AnalysisResult> similar = repository.findByContentContainingIgnoreCase(content);
+        // Exclude the current one and limit results
+        List<AnalysisResult> filtered = similar.stream()
+                .filter(r -> r.getId() != null && !r.getId().equals(entity.getId()))
+                .limit(5)
+                .toList();
+
+        return new AnalyzeResponse(prediction, confidence, explanation, matchedText, filtered);
     }
 }

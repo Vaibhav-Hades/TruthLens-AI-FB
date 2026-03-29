@@ -25,7 +25,7 @@ public class ChatController {
     @PostMapping
     public Map<String, String> chat(@RequestBody AnalyzeRequest request) {
 
-        String originalInput = request.getText();
+        String originalInput = request.getContent();
         if (originalInput == null || originalInput.trim().isEmpty()) {
             Map<String, String> error = new HashMap<>();
             error.put("reply", "⚠️ Please enter some text or a URL.");
@@ -52,7 +52,8 @@ public class ChatController {
         // Normal URL → scrape
         else if (isUrl(originalInput)) {
             String scrapedText = webScraperService.extractText(originalInput);
-            AnalyzeResponse result = analysisService.analyze(scrapedText);
+            AnalyzeResponse result = analysisService.analyze(scrapedText,
+                    request.getType() != null ? request.getType() : "url");
             reply = "🧠 Analysis:\n\n" +
                     "Verdict: " + result.getPrediction() + "\n" +
                     "Confidence: " + result.getConfidence() + "%\n" +
@@ -61,7 +62,8 @@ public class ChatController {
 
         // Plain text
         else {
-            AnalyzeResponse result = analysisService.analyze(originalInput);
+            AnalyzeResponse result = analysisService.analyze(originalInput,
+                    request.getType() != null ? request.getType() : "text");
             reply = "🧠 Verdict: " + result.getPrediction() + "\n" +
                     "Confidence: " + result.getConfidence() + "%\n" +
                     result.getExplanation();
