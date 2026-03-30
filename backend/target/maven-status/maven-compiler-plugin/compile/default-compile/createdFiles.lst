@@ -1,0 +1,12 @@
+com\example\truthlensai\service\WebScraperService.class
+com\example\truthlensai\utils\TextUtils.class
+com\example\truthlensai\model\AnalyzeRequest.class
+com\example\truthlensai\service\AnalysisService.class
+com\example\truthlensai\repository\AnalysisResultRepository.class
+com\example\truthlensai\model\AnalyzeResponse.class
+com\example\truthlensai\dataset\FakeNewsDatasetService.class
+com\example\truthlensai\controller\AnalyzeController.class
+com\example\truthlensai\model\AnalysisResult.class
+com\example\truthlensai\controller\ChatController.class
+com\example\truthlensai\service\YouTubeService.class
+com\example\truthlensai\TruthlensaiApplication.class

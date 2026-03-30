@@ -1,0 +1,25 @@
+<<<<<<< HEAD
+D:\TruthLens FRONT-END\TruthLensAi\backend\src\main\java\com\example\truthlensai\service\YouTubeService.java
+D:\TruthLens FRONT-END\TruthLensAi\backend\src\main\java\com\example\truthlensai\service\AnalysisService.java
+D:\TruthLens FRONT-END\TruthLensAi\backend\src\main\java\com\example\truthlensai\dataset\FakeNewsDatasetService.java
+D:\TruthLens FRONT-END\TruthLensAi\backend\src\main\java\com\example\truthlensai\utils\TextUtils.java
+D:\TruthLens FRONT-END\TruthLensAi\backend\src\main\java\com\example\truthlensai\model\AnalyzeRequest.java
+D:\TruthLens FRONT-END\TruthLensAi\backend\src\main\java\com\example\truthlensai\service\WebScraperService.java
+D:\TruthLens FRONT-END\TruthLensAi\backend\src\main\java\com\example\truthlensai\TruthlensaiApplication.java
+D:\TruthLens FRONT-END\TruthLensAi\backend\src\main\java\com\example\truthlensai\controller\AnalyzeController.java
+D:\TruthLens FRONT-END\TruthLensAi\backend\src\main\java\com\example\truthlensai\controller\ChatController.java
+D:\TruthLens FRONT-END\TruthLensAi\backend\src\main\java\com\example\truthlensai\model\AnalyzeResponse.java
+=======
+C:\Users\ARUN KUMAR\OneDrive\Desktop\TruthLensAi\backend\src\main\java\com\example\truthlensai\controller\AnalyzeController.java
+C:\Users\ARUN KUMAR\OneDrive\Desktop\TruthLensAi\backend\src\main\java\com\example\truthlensai\model\AnalysisResult.java
+C:\Users\ARUN KUMAR\OneDrive\Desktop\TruthLensAi\backend\src\main\java\com\example\truthlensai\repository\AnalysisResultRepository.java
+C:\Users\ARUN KUMAR\OneDrive\Desktop\TruthLensAi\backend\src\main\java\com\example\truthlensai\service\WebScraperService.java
+C:\Users\ARUN KUMAR\OneDrive\Desktop\TruthLensAi\backend\src\main\java\com\example\truthlensai\model\AnalyzeRequest.java
+C:\Users\ARUN KUMAR\OneDrive\Desktop\TruthLensAi\backend\src\main\java\com\example\truthlensai\model\AnalyzeResponse.java
+C:\Users\ARUN KUMAR\OneDrive\Desktop\TruthLensAi\backend\src\main\java\com\example\truthlensai\controller\ChatController.java
+C:\Users\ARUN KUMAR\OneDrive\Desktop\TruthLensAi\backend\src\main\java\com\example\truthlensai\service\AnalysisService.java
+C:\Users\ARUN KUMAR\OneDrive\Desktop\TruthLensAi\backend\src\main\java\com\example\truthlensai\TruthlensaiApplication.java
+C:\Users\ARUN KUMAR\OneDrive\Desktop\TruthLensAi\backend\src\main\java\com\example\truthlensai\service\YouTubeService.java
+C:\Users\ARUN KUMAR\OneDrive\Desktop\TruthLensAi\backend\src\main\java\com\example\truthlensai\utils\TextUtils.java
+C:\Users\ARUN KUMAR\OneDrive\Desktop\TruthLensAi\backend\src\main\java\com\example\truthlensai\dataset\FakeNewsDatasetService.java
+>>>>>>> 815b24c70d1b4a62e640ec2c6f6a7cf454ae611a

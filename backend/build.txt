@@ -1,0 +1,55 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< com.example:truthlensai >-----------------------
+[INFO] Building truthlensai 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ truthlensai ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ truthlensai ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 12 source files with javac [debug release 17] to target\classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/controller/ChatController.java:[28,39] cannot find symbol
+  symbol:   method getText()
+  location: variable request of type com.example.truthlensai.model.AnalyzeRequest
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/controller/ChatController.java:[55,53] method analyze in class com.example.truthlensai.service.AnalysisService cannot be applied to given types;
+  required: java.lang.String,java.lang.String
+  found:    java.lang.String
+  reason: actual and formal argument lists differ in length
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/controller/ChatController.java:[64,53] method analyze in class com.example.truthlensai.service.AnalysisService cannot be applied to given types;
+  required: java.lang.String,java.lang.String
+  found:    java.lang.String
+  reason: actual and formal argument lists differ in length
+[INFO] 3 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.814 s
+[INFO] Finished at: 2026-03-29T03:49:06+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project truthlensai: Compilation failure: Compilation failure: 
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/controller/ChatController.java:[28,39] cannot find symbol
+[ERROR]   symbol:   method getText()
+[ERROR]   location: variable request of type com.example.truthlensai.model.AnalyzeRequest
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/controller/ChatController.java:[55,53] method analyze in class com.example.truthlensai.service.AnalysisService cannot be applied to given types;
+[ERROR]   required: java.lang.String,java.lang.String
+[ERROR]   found:    java.lang.String
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /C:/Users/ARUN KUMAR/OneDrive/Desktop/TruthLensAi/backend/src/main/java/com/example/truthlensai/controller/ChatController.java:[64,53] method analyze in class com.example.truthlensai.service.AnalysisService cannot be applied to given types;
+[ERROR]   required: java.lang.String,java.lang.String
+[ERROR]   found:    java.lang.String
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
