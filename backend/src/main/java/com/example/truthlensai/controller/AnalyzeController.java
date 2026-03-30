@@ -22,18 +22,11 @@ public class AnalyzeController {
 
     @PostMapping
     public AnalyzeResponse analyze(@RequestBody AnalyzeRequest request) {
-        AnalyzeResponse response = analysisService.analyze(request.getText());
+        AnalyzeResponse response = analysisService.analyze(request.getText(), request.getType() != null ? request.getType() : "text");
         
-        // Save to Database
-        AnalysisResult result = new AnalysisResult(
-            request.getText(),
-            request.getType() != null ? request.getType() : "text",
-            response.getPrediction(),
-            response.getConfidence(),
-            response.getExplanation(),
-            response.getMatched_text()
-        );
-        analysisResultRepository.save(result);
+        // DELETE these lines 27-36
+AnalysisResult result = new AnalysisResult(...);
+analysisResultRepository.save(result);
         
         return response;
     }
