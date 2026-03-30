@@ -25,7 +25,7 @@ public class ChatController {
     @PostMapping
     public Map<String, String> chat(@RequestBody AnalyzeRequest request) {
 
-        String originalInput = request.getContent();
+        String originalInput = request.getText();
         if (originalInput == null || originalInput.trim().isEmpty()) {
             Map<String, String> error = new HashMap<>();
             error.put("reply", "⚠️ Please enter some text or a URL.");
